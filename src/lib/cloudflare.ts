@@ -15,6 +15,7 @@ export const getR2Client = () => {
     s3ClientInstance = new S3Client({
       region: 'auto',
       endpoint: safeEnv('R2_ENDPOINT'),
+      forcePathStyle: true,
       credentials: {
         accessKeyId: safeEnv('R2_ACCESS_KEY_ID'),
         secretAccessKey: safeEnv('R2_SECRET_ACCESS_KEY'),

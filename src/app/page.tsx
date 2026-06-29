@@ -43,11 +43,11 @@ export default function Home() {
         </div>
         
         <h1 style={{ 
-          fontSize: '4.5rem', 
+          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', 
           fontWeight: '800', 
           letterSpacing: '-1.5px', 
           marginBottom: '1.5rem', 
-          lineHeight: '1.15',
+          lineHeight: '1.2',
           color: 'var(--text-main)'
         }}>
           أدر مهارات <span style={{ 
@@ -58,7 +58,7 @@ export default function Home() {
         </h1>
         
         <p style={{ 
-          fontSize: '1.35rem', 
+          fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', 
           color: 'var(--text-muted)', 
           marginBottom: '3.5rem', 
           lineHeight: '1.6',
@@ -84,7 +84,7 @@ export default function Home() {
       {/* Feature Cards Showcase */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(3, 1fr)', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
         gap: '24px', 
         marginTop: '6rem',
         width: '100%',

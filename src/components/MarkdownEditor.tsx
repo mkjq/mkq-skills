@@ -12,12 +12,25 @@ const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 export default function MarkdownEditor() {
   const { theme } = useTheme();
-  const [value, setValue] = useState("# مهارة التحليل المالي\n\nاكتب المحتوى الخاص بك هنا. يمكنك طلب مساعدة الذكاء الاصطناعي للتنسيق والمراجعة.\n\n```javascript\nconsole.log('Shocking Beauty UI activated');\n```");
+  const [value, setValue] = useState("");
   const [isClient, setIsClient] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
 
   useEffect(() => {
     setIsClient(true);
+    const savedContent = localStorage.getItem('mkq_current_skill');
+    if (savedContent) {
+      setValue(savedContent);
+    } else {
+      setValue("# مهارة التحليل المالي\n\nاكتب المحتوى الخاص بك هنا. يمكنك طلب مساعدة الذكاء الاصطناعي للتنسيق والمراجعة.\n\n```javascript\nconsole.log('Shocking Beauty UI activated');\n```");
+    }
   }, []);
+
+  const handleSave = () => {
+    localStorage.setItem('mkq_current_skill', value);
+    setSaveStatus("تم الحفظ بنجاح!");
+    setTimeout(() => setSaveStatus(""), 2000);
+  };
 
   if (!isClient) return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
@@ -78,10 +91,15 @@ export default function MarkdownEditor() {
             </svg>
             <span className="text_button">Generate</span>
           </button>
-          <button className="btn-primary">
-            <Save size={18} />
-            حفظ التغييرات
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '0.9rem', opacity: saveStatus ? 1 : 0, transition: 'opacity 0.3s' }}>
+              {saveStatus}
+            </span>
+            <button className="btn-primary" onClick={handleSave}>
+              <Save size={18} />
+              حفظ التغييرات
+            </button>
+          </div>
         </div>
       </div>
 

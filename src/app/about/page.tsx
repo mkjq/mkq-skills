@@ -90,12 +90,10 @@ export default function AboutPage() {
         </p>
 
         {/* Hidden Settings Button */}
-        <Link href="/about/settings" style={{ 
+        <Link href="/about/settings" className="hidden-settings-btn" style={{ 
           position: 'absolute', 
           bottom: '24px', 
           left: '24px', 
-          color: 'rgba(255,255,255,0.2)', 
-          transition: 'all 0.3s ease',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -103,12 +101,20 @@ export default function AboutPage() {
           height: '40px',
           borderRadius: '50%',
           textDecoration: 'none'
-        }} 
-        onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; }}
-        onMouseOut={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.2)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
-        >
+        }}>
           <Settings size={18} />
         </Link>
+        <style dangerouslySetInnerHTML={{__html: `
+          .hidden-settings-btn {
+            color: rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            background-color: transparent;
+          }
+          .hidden-settings-btn:hover {
+            color: #fff;
+            background-color: rgba(255,255,255,0.1);
+          }
+        `}} />
       </div>
     </div>
   );

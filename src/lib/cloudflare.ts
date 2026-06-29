@@ -1,37 +1,53 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
-// --- R2 (S3) Configuration ---
-const s3Client = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT || '',
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
-  },
-});
+const safeEnv = (key: string) => {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] || '';
+  }
+  return '';
+};
 
-export const r2Client = s3Client;
-export const R2_BUCKET = process.env.R2_BUCKET || 'mkq-skills';
+// --- R2 (S3) Configuration ---
+let s3ClientInstance: S3Client | null = null;
+
+export const getR2Client = () => {
+  if (!s3ClientInstance) {
+    s3ClientInstance = new S3Client({
+      region: 'auto',
+      endpoint: safeEnv('R2_ENDPOINT'),
+      credentials: {
+        accessKeyId: safeEnv('R2_ACCESS_KEY_ID'),
+        secretAccessKey: safeEnv('R2_SECRET_ACCESS_KEY'),
+      },
+    });
+  }
+  return s3ClientInstance;
+};
+
+export const getR2Bucket = () => safeEnv('R2_BUCKET') || 'mkq-skills';
 
 // --- D1 (Database) Configuration ---
-const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
-const CF_DATABASE_ID = process.env.CF_DATABASE_ID;
-const CF_API_TOKEN = process.env.CF_API_TOKEN;
+const getD1Config = () => ({
+  accountId: safeEnv('CF_ACCOUNT_ID'),
+  databaseId: safeEnv('CF_DATABASE_ID'),
+  apiToken: safeEnv('CF_API_TOKEN'),
+});
 
 /**
  * Runs a SQL query against the Cloudflare D1 database via the HTTP API.
  */
 async function queryD1(sql: string, params: any[] = []): Promise<any[]> {
-  if (!CF_ACCOUNT_ID || !CF_DATABASE_ID || !CF_API_TOKEN) {
+  const { accountId, databaseId, apiToken } = getD1Config();
+  if (!accountId || !databaseId || !apiToken) {
     throw new Error('Cloudflare D1 credentials are not configured in environment variables.');
   }
 
-  const endpoint = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CF_DATABASE_ID}/query`;
+  const endpoint = `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`;
 
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${CF_API_TOKEN}`,
+      'Authorization': `Bearer ${apiToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({

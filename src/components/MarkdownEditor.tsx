@@ -1,0 +1,103 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { Save, Bot, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
+import { useTheme } from './ThemeProvider';
+
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
+
+export default function MarkdownEditor() {
+  const { theme } = useTheme();
+  const [value, setValue] = useState("# مهارة التحليل المالي\n\nاكتب المحتوى الخاص بك هنا. يمكنك طلب مساعدة الذكاء الاصطناعي للتنسيق والمراجعة.\n\n```javascript\nconsole.log('Shocking Beauty UI activated');\n```");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+      <div className="spinner-container">
+        <div className="spinner">
+          <div className="spinner">
+            <div className="spinner">
+              <div className="spinner">
+                <div className="spinner">
+                  <div className="spinner" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span style={{ marginTop: '20px', fontSize: '1rem', letterSpacing: '1px', fontWeight: '600', color: 'var(--brand-primary)' }}>جاري تحميل المحرر...</span>
+    </div>
+  );
+
+  return (
+    <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 40px)', margin: '20px', overflow: 'hidden' }}>
+      {/* Header */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '24px 32px', 
+        borderBottom: '1px solid var(--border-subtle)',
+        backgroundColor: 'var(--bg-surface-solid)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+          <Link href="/dashboard" style={{ color: 'var(--text-muted)', fontWeight: '600', textDecoration: 'none' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--brand-primary)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-muted)'}>المكتبة</Link>
+          <ChevronLeft size={16} color="var(--text-muted)" /> {/* Natively points left in LTR, acts as right arrow in RTL context if not flipped, actually we'll just use ChevronLeft to point left for hierarchy */}
+          <input 
+            type="text"
+            defaultValue="مهارة التحليل المالي.md"
+            className="input-field"
+            style={{ 
+              background: 'transparent', 
+              border: '1px solid transparent',
+              color: 'var(--text-main)', 
+              fontSize: '1.2rem', 
+              fontWeight: '700', 
+              boxShadow: 'none',
+              maxWidth: '350px',
+              padding: '8px 12px'
+            }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <button className="btn-magic">
+            <div className="dots_border" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="sparkle">
+              <path className="path" strokeLinejoin="round" strokeLinecap="round" stroke="black" fill="black" d="M14.187 8.096L15 5.25L15.813 8.096C16.0231 8.83114 16.4171 9.50062 16.9577 10.0413C17.4984 10.5819 18.1679 10.9759 18.903 11.186L21.75 12L18.904 12.813C18.1689 13.0231 17.4994 13.4171 16.9587 13.9577C16.4181 14.4984 16.0241 15.1679 15.814 15.903L15 18.75L14.187 15.904C13.9769 15.1689 13.5829 14.4994 13.0423 13.9587C12.5016 13.4181 11.8321 13.0241 11.097 12.814L8.25 12L11.096 11.187C11.8311 10.9769 12.5006 10.5829 13.0413 10.0423C13.5819 9.50162 13.9759 8.83214 14.186 8.097L14.187 8.096Z" />
+              <path className="path" strokeLinejoin="round" strokeLinecap="round" stroke="black" fill="black" d="M6 14.25L5.741 15.285C5.59267 15.8785 5.28579 16.4206 4.85319 16.8532C4.42059 17.2858 3.87853 17.5927 3.285 17.741L2.25 18L3.285 18.259C3.87853 18.4073 4.42059 18.7142 4.85319 19.1468C5.28579 19.5794 5.59267 20.1215 5.741 20.715L6 21.75L6.259 20.715C6.40725 20.1216 6.71398 19.5796 7.14639 19.147C7.5788 18.7144 8.12065 18.4075 8.714 18.259L9.75 18L8.714 17.741C8.12065 17.5925 7.5788 17.2856 7.14639 16.853C6.71398 16.4204 6.40725 15.8784 6.259 15.285L6 14.25Z" />
+              <path className="path" strokeLinejoin="round" strokeLinecap="round" stroke="black" fill="black" d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 6.09226 6.24777 6.24282 6.303 6.4085L6.5 7L6.697 6.4085C6.75223 6.24282 6.84528 6.09226 6.96877 5.96877C7.09226 5.84528 7.24282 5.75223 7.4085 5.697L8 5.5L7.4085 5.303C7.24282 5.24777 7.09226 5.15472 6.96877 5.03123C6.84528 4.90774 6.75223 4.75718 6.697 4.5915L6.5 4Z" />
+            </svg>
+            <span className="text_button">Generate</span>
+          </button>
+          <button className="btn-primary">
+            <Save size={18} />
+            حفظ التغييرات
+          </button>
+        </div>
+      </div>
+
+      {/* Editor */}
+      <div data-color-mode={theme} style={{ flex: 1, overflow: 'hidden' }} dir="ltr" className="md-editor-rtl-fix">
+        <MDEditor
+          value={value}
+          onChange={(val) => setValue(val || '')}
+          height="100%"
+          visibleDragbar={false}
+          style={{ border: 'none', borderRadius: 0 }}
+          previewOptions={{ 
+             style: { backgroundColor: 'transparent' }
+          }}
+        />
+      </div>
+    </div>
+  );
+}

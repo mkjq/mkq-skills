@@ -13,23 +13,38 @@ const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 export default function MarkdownEditor() {
   const { theme } = useTheme();
   const [value, setValue] = useState("");
+  const [filename, setFilename] = useState("مهارة جديدة.md");
   const [isClient, setIsClient] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    const savedContent = localStorage.getItem('mkq_current_skill');
-    if (savedContent) {
-      setValue(savedContent);
-    } else {
-      setValue("# مهارة التحليل المالي\n\nاكتب المحتوى الخاص بك هنا. يمكنك طلب مساعدة الذكاء الاصطناعي للتنسيق والمراجعة.\n\n```javascript\nconsole.log('Shocking Beauty UI activated');\n```");
-    }
+    setValue("# מهارة جديدة\n\nاكتب المحتوى الخاص بك هنا...");
   }, []);
 
-  const handleSave = () => {
-    localStorage.setItem('mkq_current_skill', value);
-    setSaveStatus("تم الحفظ بنجاح!");
-    setTimeout(() => setSaveStatus(""), 2000);
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveStatus("جاري الرفع للسحابة...");
+    try {
+      const response = await fetch('/api/skills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename, content: value })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSaveStatus("تم الحفظ في Cloudflare R2!");
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSaveStatus("فشل الحفظ: " + err.message);
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveStatus(""), 3000);
+    }
   };
 
   if (!isClient) return (
@@ -67,7 +82,8 @@ export default function MarkdownEditor() {
           <ChevronLeft size={16} color="var(--text-muted)" /> {/* Natively points left in LTR, acts as right arrow in RTL context if not flipped, actually we'll just use ChevronLeft to point left for hierarchy */}
           <input 
             type="text"
-            defaultValue="مهارة التحليل المالي.md"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
             className="input-field"
             style={{ 
               background: 'transparent', 
@@ -92,12 +108,12 @@ export default function MarkdownEditor() {
             <span className="text_button">Generate</span>
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '0.9rem', opacity: saveStatus ? 1 : 0, transition: 'opacity 0.3s' }}>
+            <span style={{ color: saveStatus.includes('فشل') ? '#ef4444' : '#10b981', fontWeight: 'bold', fontSize: '0.9rem', opacity: saveStatus ? 1 : 0, transition: 'opacity 0.3s' }}>
               {saveStatus}
             </span>
-            <button className="btn-primary" onClick={handleSave}>
+            <button className="btn-primary" onClick={handleSave} disabled={saving}>
               <Save size={18} />
-              حفظ التغييرات
+              {saving ? 'جاري الرفع...' : 'حفظ التغييرات'}
             </button>
           </div>
         </div>

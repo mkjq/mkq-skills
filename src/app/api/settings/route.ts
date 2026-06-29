@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getGlobalSettings, updateGlobalSettings, initializeD1 } from '@/lib/cloudflare';
 
-
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {

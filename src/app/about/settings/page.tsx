@@ -17,14 +17,16 @@ export default function SettingsPage() {
     aiSystemPrompt: 'أنت مساعد ذكي ومبدع يقدم إجابات دقيقة واحترافية.'
   });
 
-  const loadSettings = () => {
+  const loadSettings = async () => {
     try {
-      const saved = localStorage.getItem('mkq_global_settings');
-      if (saved) {
-        setSettings(JSON.parse(saved));
+      const response = await fetch('/api/settings');
+      const data = await response.json();
+      if (data.success && data.settings) {
+        setSettings(data.settings);
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
+      setMessage("تنبيه: لم يتم الاتصال بقاعدة بيانات Cloudflare بعد.");
     } finally {
       setLoading(false);
     }
@@ -46,15 +48,24 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      localStorage.setItem('mkq_global_settings', JSON.stringify(settings));
-      setMessage('تم حفظ الإعدادات بنجاح (تخزين محلي آمن)!');
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMessage('تم حفظ الإعدادات السحابية في Cloudflare بنجاح!');
+      } else {
+        throw new Error(data.error);
+      }
     } catch (err) {
       console.error("Failed to save settings:", err);
-      setMessage("فشل الحفظ. تأكد من إعدادات المتصفح.");
+      setMessage("فشل الحفظ، تأكد من إعدادات وصلاحيات Cloudflare.");
     } finally {
       setSaving(false);
       setTimeout(() => setMessage(''), 3000);

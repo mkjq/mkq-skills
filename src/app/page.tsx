@@ -43,11 +43,11 @@ export default function Home() {
         </div>
         
         <h1 style={{ 
-          fontSize: 'clamp(2rem, 5vw, 3.2rem)', 
+          fontSize: 'clamp(1.8rem, 4vw, 3rem)', 
           fontWeight: '800', 
           letterSpacing: '-1px', 
           marginBottom: '1rem', 
-          lineHeight: '1.2',
+          lineHeight: '1.3',
           color: 'var(--text-main)'
         }}>
           أدر مهارات <span style={{ 
@@ -58,24 +58,24 @@ export default function Home() {
         </h1>
         
         <p style={{ 
-          fontSize: 'clamp(1rem, 2vw, 1.15rem)', 
+          fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)', 
           color: 'var(--text-muted)', 
-          marginBottom: '3.5rem', 
+          marginBottom: '2.5rem', 
           lineHeight: '1.6',
-          maxWidth: '700px',
+          maxWidth: '650px',
           fontWeight: '500'
         }}>
           منصتك المتكاملة لكتابة، وحفظ، وتعديل ملفات الـ Prompts. مدعومة بخيارات متعددة من واجهات الذكاء الاصطناعي وبمزامنة سحابية فورية ومظهر يفوق التوقعات.
         </p>
         
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/dashboard" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ padding: '18px 40px', fontSize: '1.2rem', borderRadius: '12px' }}>
+            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
               ابدأ الاستخدام الآن
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} />
             </button>
           </Link>
-          <button className="btn-secondary" style={{ padding: '18px 40px', fontSize: '1.2rem', borderRadius: '12px' }}>
+          <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
              استكشف المميزات
           </button>
         </div>
@@ -86,7 +86,8 @@ export default function Home() {
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
         gap: '24px', 
-        marginTop: '6rem',
+        marginTop: '4rem',
+        marginBottom: '4rem',
         width: '100%',
         maxWidth: '1100px'
       }}>

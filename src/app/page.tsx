@@ -43,10 +43,10 @@ export default function Home() {
         </div>
         
         <h1 style={{ 
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', 
+          fontSize: 'clamp(2rem, 5vw, 3.2rem)', 
           fontWeight: '800', 
-          letterSpacing: '-1.5px', 
-          marginBottom: '1.5rem', 
+          letterSpacing: '-1px', 
+          marginBottom: '1rem', 
           lineHeight: '1.2',
           color: 'var(--text-main)'
         }}>
@@ -58,7 +58,7 @@ export default function Home() {
         </h1>
         
         <p style={{ 
-          fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', 
+          fontSize: 'clamp(1rem, 2vw, 1.15rem)', 
           color: 'var(--text-muted)', 
           marginBottom: '3.5rem', 
           lineHeight: '1.6',

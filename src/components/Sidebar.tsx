@@ -85,25 +85,6 @@ export default function Sidebar() {
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           {theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
         </button>
-
-        <Link href="/dashboard/settings" style={{ 
-          textDecoration: 'none', 
-          color: 'var(--text-muted)', 
-          padding: '10px 14px',
-          borderRadius: '8px',
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '12px',
-          fontSize: '0.95rem',
-          fontWeight: '600',
-          transition: 'all 0.2s'
-        }} 
-        onMouseOver={(e) => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.backgroundColor = 'var(--bg-surface-hover)'; }}
-        onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
-        >
-          <Settings size={18} />
-          إعدادات المنصة
-        </Link>
       </div>
     </div>
   );

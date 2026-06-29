@@ -81,11 +81,12 @@ export default function AboutPage() {
       </div>
       
       <div style={{ position: 'relative', zIndex: 10, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <h1 style={{ color: '#fff', fontSize: '3.5rem', fontWeight: 'bold', textShadow: '0 4px 20px rgba(255,255,255,0.3)', letterSpacing: '2px' }}>
-          من نحن
+        <h1 style={{ color: '#fff', fontSize: '3.5rem', fontWeight: 'bold', textShadow: '0 4px 20px rgba(255,255,255,0.3)', letterSpacing: '2px', marginBottom: '10px' }}>
+          Hakareo
         </h1>
-        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.2rem', marginTop: '24px', maxWidth: '600px', textAlign: 'center', lineHeight: '1.8' }}>
-          منصة إبداعية متكاملة تدمج التكنولوجيا المتطورة بالجمال الفني. صُممت لتلهم وتُبهج كل من يستخدمها.
+        <h2 style={{ color: 'var(--brand-primary)', fontSize: '1.5rem', fontWeight: '600', marginBottom: '24px' }}>المطور والمهندس وراء MKQ Skills</h2>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.2rem', maxWidth: '600px', textAlign: 'center', lineHeight: '1.8' }}>
+          منصة إبداعية متكاملة تدمج التكنولوجيا المتطورة بالجمال الفني. صُممت لتلهم وتُبهج كل من يستخدمها، وتم بناؤها بأحدث التقنيات السحابية.
         </p>
 
         {/* Hidden Settings Button */}

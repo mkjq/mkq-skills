@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getGlobalSettings, updateGlobalSettings, initializeD1 } from '@/lib/cloudflare';
 
+export const runtime = 'edge';
+
 export async function GET() {
   try {
     await initializeD1(); // Ensure table exists

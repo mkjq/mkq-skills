@@ -603,3 +603,36 @@ body {
 .footer-link:hover {
   color: var(--brand-primary);
 }
+
+/* Magic Hover Card Animation (Requested by User) */
+.magic-card {
+  position: relative;
+  overflow: hidden;
+}
+.magic-card-inner {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+}
+.magic-card::before {
+  content: '';
+  position: absolute;
+  width: 7rem;
+  height: 7rem;
+  background-color: transparent;
+  filter: blur(0px);
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  left: -1rem;
+  top: -3rem;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+.magic-card:hover::before {
+  top: 7rem;
+  left: 11rem;
+  transform: scale(1.5);
+  filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.05);
+}

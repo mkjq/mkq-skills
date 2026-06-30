@@ -186,6 +186,7 @@ export default function LibraryPage() {
     const canDelete = user && (user.role === 'admin' || user.username === file.owner || (!file.owner && activeTab === 'private'));
     return (
       <div
+        className="magic-card"
         style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
           backdropFilter: 'blur(24px)',
@@ -212,42 +213,43 @@ export default function LibraryPage() {
           (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
         }}
       >
-        {/* Glow */}
-        <div style={{ position: 'absolute', top: 0, right: 0, width: '80px', height: '80px', background: 'var(--brand-glow)', borderRadius: '50%', filter: 'blur(40px)', opacity: 0.5, pointerEvents: 'none' }} />
+        <div className="magic-card-inner" style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+          {/* Glow */}
+          <div style={{ position: 'absolute', top: 0, right: 0, width: '80px', height: '80px', background: 'var(--brand-glow)', borderRadius: '50%', filter: 'blur(40px)', opacity: 0.5, pointerEvents: 'none' }} />
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', position: 'relative' }}>
-          <div style={{ width: '46px', height: '46px', borderRadius: '12px', flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-primary), #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px var(--brand-glow)' }}>
-            <FileText size={22} color="#fff" />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontWeight: '700', fontSize: '1rem', marginBottom: '6px', wordBreak: 'break-word', color: 'var(--text-main)', lineHeight: '1.3' }}>{file.filename}</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                {formatSize(file.size)}
-              </span>
-              {file.lastModified && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(file.lastModified).toLocaleDateString('ar-SA')}</span>}
-              {file.owner && <span style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', fontWeight: '600' }}>@{file.owner}</span>}
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', position: 'relative' }}>
+            <div style={{ width: '46px', height: '46px', borderRadius: '12px', flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-primary), #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px var(--brand-glow)' }}>
+              <FileText size={22} color="#fff" />
             </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontWeight: '700', fontSize: '1rem', marginBottom: '6px', wordBreak: 'break-word', color: 'var(--text-main)', lineHeight: '1.3' }}>{file.filename}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  {formatSize(file.size)}
+                </span>
+                {file.lastModified && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(file.lastModified).toLocaleDateString('ar-SA')}</span>}
+                {file.owner && <span style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', fontWeight: '600' }}>@{file.owner}</span>}
+              </div>
+            </div>
+            {/* Favorite button */}
+            <button
+              onClick={() => handleToggleFavorite(file.key, file.filename)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', flexShrink: 0, transition: 'transform 0.2s' }}
+              title={isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = 'scale(1.2)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = 'scale(1)'}
+            >
+              <Heart size={18} fill={isFav ? '#ef4444' : 'none'} color={isFav ? '#ef4444' : 'var(--text-muted)'} />
+            </button>
           </div>
-          {/* Favorite button */}
-          <button
-            onClick={() => handleToggleFavorite(file.key, file.filename)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', flexShrink: 0, transition: 'transform 0.2s' }}
-            title={isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
-            onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = 'scale(1.2)'}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = 'scale(1)'}
-          >
-            <Heart size={18} fill={isFav ? '#ef4444' : 'none'} color={isFav ? '#ef4444' : 'var(--text-muted)'} />
-          </button>
-        </div>
 
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', marginTop: 'auto' }} />
 
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Link href={`/dashboard/editor?key=${encodeURIComponent(file.key)}`} style={{ textDecoration: 'none', flex: 1 }}>
-            <button className="btn-primary" style={{ width: '100%', padding: '9px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Link href={`/dashboard/editor?key=${encodeURIComponent(file.key)}`} style={{ textDecoration: 'none', flex: 1 }}>
+              <button className="btn-primary" style={{ width: '100%', padding: '9px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
               <Eye size={14} /> عرض وتعديل
             </button>
           </Link>
@@ -259,6 +261,7 @@ export default function LibraryPage() {
               <Trash2 size={14} />
             </button>
           )}
+        </div>
         </div>
       </div>
     );

@@ -8,24 +8,28 @@ const safeEnv = (key: string) => {
 };
 
 // --- R2 (S3) Configuration ---
-let s3ClientInstance: S3Client | null = null;
-
+// Always create a fresh client so we always use the current env vars
 export const getR2Client = () => {
-  if (!s3ClientInstance) {
-    s3ClientInstance = new S3Client({
-      region: 'auto',
-      endpoint: safeEnv('R2_ENDPOINT'),
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: safeEnv('R2_ACCESS_KEY_ID'),
-        secretAccessKey: safeEnv('R2_SECRET_ACCESS_KEY'),
-      },
-    });
+  const endpoint = safeEnv('R2_ENDPOINT');
+  const accessKeyId = safeEnv('R2_ACCESS_KEY_ID');
+  const secretAccessKey = safeEnv('R2_SECRET_ACCESS_KEY');
+
+  if (!endpoint || !accessKeyId || !secretAccessKey) {
+    throw new Error('R2 credentials are not configured. Please set R2_ENDPOINT, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY.');
   }
-  return s3ClientInstance;
+
+  return new S3Client({
+    region: 'auto',
+    endpoint,
+    credentials: { accessKeyId, secretAccessKey },
+  });
 };
 
-export const getR2Bucket = () => safeEnv('R2_BUCKET') || 'mkq-skills';
+export const getR2Bucket = () => {
+  const bucket = safeEnv('R2_BUCKET');
+  if (!bucket) throw new Error('R2_BUCKET is not configured.');
+  return bucket;
+};
 
 // --- D1 (Database) Configuration ---
 const getD1Config = () => ({

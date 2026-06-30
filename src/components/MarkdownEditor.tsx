@@ -119,51 +119,107 @@ export default function MarkdownEditor() {
     // Detect if user wrote a description/request or an existing partial skill
     const isExistingSkill = value.trim().startsWith('#');
     
+    const RICH_MARKDOWN_RULES = `
+## 🎨 MANDATORY VISUAL FORMATTING RULES — FOLLOW STRICTLY
+
+You MUST produce visually stunning, GitHub-quality Markdown. Plain text is UNACCEPTABLE. Every section must use rich visual elements:
+
+### Required Visual Elements:
+1. **Emoji in every H1, H2, H3 heading** — choose contextually relevant emojis
+2. **Shields.io badges** in the header area for metadata (e.g. version, language, model compatibility):
+   \`![GPT-4](https://img.shields.io/badge/GPT--4-Compatible-brightgreen?style=flat-square)\`
+   \`![Claude](https://img.shields.io/badge/Claude-Compatible-blue?style=flat-square)\`
+   \`![DeepSeek](https://img.shields.io/badge/DeepSeek-Compatible-orange?style=flat-square)\`
+3. **Horizontal rules** (\`---\`) between major sections
+4. **Tables** for comparisons, examples, or structured data — use ✅ ❌ 🟡 in table cells
+5. **Code blocks** with language tags for any examples: \`\`\`markdown, \`\`\`json, \`\`\`text
+6. **Blockquotes** (\`> \`) for important notes, warnings, or tips
+7. **Bold + italic emphasis** — \`**bold**\`, \`*italic*\`, \`***bold italic***\` — use them liberally
+8. **Numbered + nested bullet lists** for all procedures and rules
+9. **Callout-style sections** using blockquote with emoji: \`> 💡 **Tip:** ...\` \`> ⚠️ **Warning:** ...\`
+10. **HTML-style centered banners** for the title area if needed
+
+### Example of how a GREAT header looks:
+\`\`\`markdown
+# 🧠 University Project Proofreading Expert
+
+> *A precision AI editor for academic documents — powered by scholarly rigor and linguistic mastery*
+
+![Version](https://img.shields.io/badge/Version-2.0-brightgreen?style=flat-square)
+![Arabic](https://img.shields.io/badge/Language-Arabic%20%2F%20English-blue?style=flat-square)
+![GPT-4](https://img.shields.io/badge/GPT--4-✓-green?style=flat-square)
+![Claude](https://img.shields.io/badge/Claude-✓-blue?style=flat-square)
+![DeepSeek](https://img.shields.io/badge/DeepSeek-✓-orange?style=flat-square)
+
+---
+\`\`\`
+
+### Example of a GREAT comparison table:
+| Feature | This AI | Standard Checker |
+|---------|---------|-----------------|
+| Grammar ✅ | Contextual | Surface-level |
+| Academic tone ✅ | Specialized | Generic |
+| Arabic support 🌍 | Native | Limited |
+
+### Example of a GREAT example section:
+\`\`\`text
+📥 INPUT:
+"ان الطلاب يجب عليهم المذاكرة بشكل يومي"
+
+📤 OUTPUT:
+✅ Corrected: "يجب على الطلاب المذاكرة يومياً"
+📝 Changes: Restructured sentence, removed redundancy, improved formality
+\`\`\`
+
+DO NOT PRODUCE plain text paragraphs without visual structure. EVERY section needs visual richness.
+`;
+
     const aiPrompt = isExistingSkill
-      ? `You are given an existing AI Skill file in Markdown format. Your task is to IMPROVE and COMPLETE it to become a world-class, production-ready Skill file.
+      ? `You are given an existing AI Skill file. Your task is to TRANSFORM it into a visually stunning, world-class, production-ready Skill file.
 
 EXISTING SKILL:
 \`\`\`markdown
 ${value}
 \`\`\`
 
-INSTRUCTIONS:
-1. Keep the original intent and purpose of the skill
-2. Rewrite vague or incomplete instructions with crystal-clear precision
-3. Add missing sections (Role, Constraints, Examples, Edge Cases, Output Format, Tone & Style)
-4. Strengthen the role definition — make the AI identity unmistakable
-5. Add explicit constraints (what NOT to do)
-6. Add at least 2 concrete input/output examples
-7. Ensure the output format is explicitly defined
-8. Fix any Markdown formatting issues
+${RICH_MARKDOWN_RULES}
 
-OUTPUT: Return ONLY the complete improved Markdown file, nothing else. Start directly with the # heading.`
-      : `You are given a user request or description for a new AI Skill. Your task is to generate a complete, world-class, production-ready AI Skill file in Markdown format.
+## YOUR TASK:
+1. Keep the original intent and purpose
+2. Rewrite ALL sections with crystal-clear precision
+3. Add ALL missing sections: Role & Identity, Core Responsibilities, Behavioral Guidelines, Constraints, Input Format, Output Format, Tone & Style, Examples, Edge Cases
+4. Add emoji to every heading
+5. Add shields.io compatibility badges after the title
+6. Add tables wherever comparisons or structured data appear
+7. Add code blocks for all examples (use proper language tags)
+8. Add blockquote callouts for tips and warnings
+9. Strengthen constraints — make them explicit and numbered
+10. Add at least 3 realistic input/output examples in formatted code blocks
 
-USER REQUEST:
-"${value}"
+OUTPUT: Return ONLY the complete transformed Markdown. Start directly with # emoji heading. No preamble.`
+      : `You are given a user request for a new AI Skill. Generate a VISUALLY STUNNING, world-class, production-ready AI Skill file in Markdown format.
 
-INSTRUCTIONS:
-Generate a complete Skill file with ALL of the following sections, in this exact order:
-1. # [Skill Name] — Clear, descriptive title
-2. ## Overview — 2-3 sentences describing what this skill does
-3. ## Role & Identity — Who the AI IS and its persona
-4. ## Core Responsibilities — Numbered list of primary tasks
-5. ## Behavioral Guidelines — How the AI should behave and respond
-6. ## Constraints — Explicit list of what the AI must NEVER do
-7. ## Input Format — What the user provides
-8. ## Output Format — Exact structure of every response
-9. ## Tone & Style — Communication style
-10. ## Examples — At least 2-3 realistic input/output pairs
-11. ## Edge Cases — How to handle ambiguous or difficult inputs
+USER REQUEST: "${value}"
 
-RULES:
-- Write EVERY section fully — no placeholders, no "to be filled" text
-- Make the skill immediately usable in GPT-4, Claude, DeepSeek, Gemini
-- Be specific, not generic — avoid vague instructions like "be helpful"
-- Use proper Markdown formatting with headers, bullet lists, bold text, code blocks where needed
+${RICH_MARKDOWN_RULES}
 
-OUTPUT: Return ONLY the complete Markdown file. Start directly with # heading. No preamble, no explanation.`;
+## REQUIRED SECTIONS IN ORDER:
+1. \`# 🎯 [Skill Name]\` — with emoji, then tagline in italic blockquote
+2. Shields.io badges (version, language, model compatibility)
+3. \`---\`
+4. \`## 📋 Overview\` — 2-3 sentences, then a quick-reference table
+5. \`## 🎭 Role & Identity\` — vivid persona description
+6. \`## ✅ Core Responsibilities\` — numbered list with sub-bullets
+7. \`## 🧭 Behavioral Guidelines\` — numbered rules with examples
+8. \`## 🚫 Constraints\` — table with DO / DON'T columns
+9. \`## 📥 Input Format\` — structured with code block example
+10. \`## 📤 Output Format\` — exact template in code block
+11. \`## 🎨 Tone & Style\` — descriptive with examples
+12. \`## 💬 Examples\` — 3 full input/output pairs in formatted code blocks
+13. \`## ⚡ Edge Cases\` — table with Scenario / How to Handle columns
+14. \`---\` + footer badge line
+
+OUTPUT: Return ONLY the complete Markdown file. Start with # emoji heading. No preamble, no explanation.`;
 
     try {
       const response = await fetch('/api/ai', {

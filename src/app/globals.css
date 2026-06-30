@@ -325,7 +325,7 @@ body {
 }
 
 /* Prevent tokens in the syntax highlighter from changing character widths, heights, or sizes and shifting the cursor */
-.md-editor-rtl-fix .w-md-editor-text-pre .token {
+.md-editor-rtl-fix .w-md-editor-text-pre * {
   font-weight: normal !important;
   font-style: normal !important;
   font-size: inherit !important;

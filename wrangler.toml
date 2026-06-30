@@ -1,0 +1,10 @@
+name = "mkq-skills"
+compatibility_date = "2024-03-20"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+CF_ACCOUNT_ID = "15272b79dac2d17ec9c3ea54519a674f"
+CF_DATABASE_ID = "6fe8fbbd-8e04-42a0-9b48-aa5f17e497e9"
+R2_ACCESS_KEY_ID = "bab56c56d10bc28d70c5120dc0b21adc"
+R2_ENDPOINT = "https://15272b79dac2d17ec9c3ea54519a674f.r2.cloudflarestorage.com"
+R2_BUCKET = "mkq-skills"

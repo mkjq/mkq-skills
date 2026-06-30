@@ -1,33 +1,72 @@
 import { NextResponse } from 'next/server';
+import { queryD1 } from '@/lib/cloudflare';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { prompt, apiType, apiKey, model, baseUrl } = await req.json();
+    const { prompt } = await req.json();
 
-    let endpoint = baseUrl || 'https://openrouter.ai/api/v1/chat/completions';
-    let headers: any = {
+    // Fetch settings from D1
+    const sql = `SELECT openRouterApiKey, standardApiKey, aiSystemPrompt FROM global_settings WHERE id = 'global'`;
+    const rows = await queryD1(sql);
+    
+    if (!rows || rows.length === 0) {
+      return NextResponse.json({ error: 'Settings not found' }, { status: 500 });
+    }
+
+    const settings = rows[0];
+    const apiKey = settings.openRouterApiKey || settings.standardApiKey;
+    
+    if (!apiKey) {
+      return NextResponse.json({ error: 'AI API Key is not configured in settings' }, { status: 400 });
+    }
+
+    // Default to OpenRouter if openRouterApiKey is provided
+    const isOpenRouter = !!settings.openRouterApiKey;
+    const endpoint = isOpenRouter 
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://api.openai.com/v1/chat/completions'; // Fallback to OpenAI compatible
+
+    const headers: any = {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     };
 
-    if (apiType === 'openrouter') {
-      headers['HTTP-Referer'] = 'http://localhost:3000';
-      headers['X-Title'] = 'Skills Manager';
-      endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+    if (isOpenRouter) {
+      headers['HTTP-Referer'] = 'https://skills.mkq.one';
+      headers['X-Title'] = 'MKQ Skills';
     }
 
     const response = await fetch(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        model: model || 'meta-llama/llama-3-8b-instruct',
-        messages: [{ role: 'user', content: prompt }]
+        model: isOpenRouter ? 'google/gemini-2.5-pro' : 'gpt-4o', // default models
+        stream: true,
+        messages: [
+          { role: 'system', content: settings.aiSystemPrompt || 'You are an AI assistant.' },
+          { role: 'user', content: prompt }
+        ]
       })
     });
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch AI response' }, { status: 500 });
+    if (!response.ok) {
+      const errorText = await response.text();
+      return NextResponse.json({ error: 'AI API Error: ' + errorText }, { status: response.status });
+    }
+
+    // Return the readable stream directly to the client
+    return new Response(response.body, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
+
+  } catch (error: any) {
+    console.error('AI Route Error:', error);
+    return NextResponse.json({ error: 'Failed to process AI request' }, { status: 500 });
   }
 }

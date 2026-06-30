@@ -106,6 +106,18 @@ export async function initializeD1() {
   `;
   await queryD1(usersSql);
 
+  const favoritesSql = `
+    CREATE TABLE IF NOT EXISTS favorites (
+      id TEXT PRIMARY KEY,
+      username TEXT NOT NULL,
+      file_key TEXT NOT NULL,
+      filename TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(username, file_key)
+    );
+  `;
+  await queryD1(favoritesSql);
+
   // Insert default row if it doesn't exist
   const checkSql = `SELECT id FROM global_settings WHERE id = 'global'`;
   const result = await queryD1(checkSql);

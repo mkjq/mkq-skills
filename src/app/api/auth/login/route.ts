@@ -1,22 +1,24 @@
 import { NextResponse } from 'next/server';
-import { queryD1 } from '@/lib/cloudflare';
+import { queryD1, initializeD1 } from '@/lib/cloudflare';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
+    await initializeD1(); // Ensure tables + admin user exist
+    
     const { username, password } = await req.json();
 
     if (!username || !password) {
-      return NextResponse.json({ success: false, error: 'Username and password are required' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'اسم المستخدم وكلمة المرور مطلوبان' }, { status: 400 });
     }
 
     const sql = `SELECT * FROM users WHERE username = ? AND password = ?`;
     const users = await queryD1(sql, [username, password]);
 
     if (users.length === 0) {
-      return NextResponse.json({ success: false, error: 'Invalid username or password' }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, { status: 401 });
     }
 
     const user = users[0];

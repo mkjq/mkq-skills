@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Download, Eye, Star, Users, Lock, Plus, RefreshCw, FileText, Trash2, LogIn, LogOut } from 'lucide-react';
+import { Download, Eye, Users, Lock, Plus, RefreshCw, FileText, Trash2, LogIn, LogOut } from 'lucide-react';
 import FolderUpload from '@/components/FolderUpload';
 import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -171,19 +171,15 @@ export default function LibraryPage() {
                 {uploadMsg}
               </span>
             )}
-            {(activeTab === 'private' || activeTab === 'public') && (
-              <>
-                <FolderUpload onChange={handleFileUpload} uploading={uploading} />
-                <button
-                  className="btn-secondary"
-                  onClick={() => loadFiles(activeTab)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px' }}
-                  title="تحديث"
-                >
-                  <RefreshCw size={16} />
-                </button>
-              </>
-            )}
+            <FolderUpload onChange={handleFileUpload} uploading={uploading} />
+            <button
+              className="btn-secondary"
+              onClick={() => loadFiles(activeTab)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px' }}
+              title="تحديث"
+            >
+              <RefreshCw size={16} />
+            </button>
             <Link href="/dashboard/editor" style={{ textDecoration: 'none' }}>
               <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
                 <Plus size={16} />
@@ -235,15 +231,7 @@ export default function LibraryPage() {
               }
             </div>
 
-            {activeTab === 'public' && (
-              <div style={{
-                padding: '14px 20px', borderRadius: '10px', marginBottom: '24px',
-                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)',
-                color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6'
-              }}>
-                🌍 هذا القسم مفتوح للجميع. يمكن لأي شخص رفع ملفات .md أو .txt وتعديلها مجاناً بدون تسجيل دخول. كن محترماً مع مشاركات الآخرين!
-              </div>
-            )}
+
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>

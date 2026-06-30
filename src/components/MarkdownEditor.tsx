@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Save, ChevronLeft } from 'lucide-react';
+import { Save, ChevronLeft, Globe, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import '@uiw/react-md-editor/markdown-editor.css';
@@ -25,6 +25,10 @@ export default function MarkdownEditor() {
   const [saving, setSaving] = useState(false);
   const [loadingFile, setLoadingFile] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  // visibility: 'private' | 'public'
+  const [visibility, setVisibility] = useState<'private' | 'public'>('private');
+  // isFork: true when editing a public file that belongs to someone else
+  const [isFork, setIsFork] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -34,17 +38,34 @@ export default function MarkdownEditor() {
   useEffect(() => {
     if (!fileKey) {
       setValue('# مهارة جديدة\n\nاكتب المحتوى الخاص بك هنا...');
+      setVisibility('private');
+      setIsFork(false);
       return;
     }
     setLoadingFile(true);
-    const fname = fileKey.split('/').pop() || 'file.md';
+    const parts = fileKey.split('/');
+    const fileFolder = parts[0]; // 'public' or 'private'
+    const fileOwner = parts.length >= 3 ? parts[1] : '';
+    const fname = parts[parts.length - 1] || 'file.md';
     setFilename(fname);
+
+    // Detect fork: user is editing a public file that doesn't belong to them
+    const isOtherPublic = fileFolder === 'public' && user && fileOwner !== user.username;
+    const isNoOwner = fileFolder === 'public' && !fileOwner;
+    if (isOtherPublic || isNoOwner) {
+      setIsFork(true);
+      setVisibility('private'); // default fork to private
+    } else {
+      setIsFork(false);
+      setVisibility(fileFolder === 'public' ? 'public' : 'private');
+    }
+
     fetch(`/api/skills/download?key=${encodeURIComponent(fileKey)}`)
       .then(r => r.text())
       .then(text => setValue(text))
       .catch(() => setValue('# فشل تحميل الملف'))
       .finally(() => setLoadingFile(false));
-  }, [fileKey]);
+  }, [fileKey, user]);
 
   const handleSave = async () => {
     if (!user) {
@@ -56,25 +77,36 @@ export default function MarkdownEditor() {
     setSaving(true);
     setSaveStatus('جاري الرفع للسحابة...');
     try {
-      // Determine folder from the key (if editing existing file) or default to private
-      const folder = fileKey ? fileKey.split('/')[0] : 'private';
+      // If fork mode: always save as a NEW file in user's own folder (no existingKey)
+      // If owner or admin editing own file: overwrite existingKey
+      const parts = fileKey ? fileKey.split('/') : [];
+      const fileOwner = parts.length >= 3 ? parts[1] : '';
+      const isOwner = user && (user.role === 'admin' || fileOwner === user.username);
+      const useExistingKey = fileKey && isOwner && !isFork ? fileKey : undefined;
+
       const response = await fetch('/api/skills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, content: value, folder, existingKey: fileKey })
+        body: JSON.stringify({
+          filename,
+          content: value,
+          folder: visibility,
+          existingKey: useExistingKey
+        })
       });
       const data = await response.json();
       if (data.success) {
-        setSaveStatus('تم الحفظ في Cloudflare R2!');
+        setSaveStatus(isFork ? '✅ تم حفظ نسخة في مكتبتك!' : '✅ تم الحفظ في السحابة!');
+        setIsFork(false); // After fork save, it's now the user's own file
       } else {
         throw new Error(data.error);
       }
     } catch (err: any) {
       console.error(err);
-      setSaveStatus('فشل الحفظ: ' + err.message);
+      setSaveStatus('❌ فشل الحفظ: ' + err.message);
     } finally {
       setSaving(false);
-      setTimeout(() => setSaveStatus(''), 3000);
+      setTimeout(() => setSaveStatus(''), 4000);
     }
   };
 
@@ -221,9 +253,30 @@ OUTPUT: Return ONLY the complete Markdown file. Start directly with # heading. N
             style={{ background: 'transparent', border: '1px solid transparent', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700', boxShadow: 'none', maxWidth: '320px', padding: '8px 10px' }}
           />
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <button 
-            className="btn-magic" 
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Fork notice */}
+          {isFork && (
+            <span style={{ fontSize: '0.8rem', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', padding: '4px 10px', borderRadius: '6px' }}>
+              ✂️ نسخة مُعدَّلة — ستُحفظ في مكتبتك
+            </span>
+          )}
+
+          {/* Visibility toggle */}
+          <button
+            onClick={() => setVisibility(v => v === 'private' ? 'public' : 'private')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', fontSize: '0.85rem',
+              color: visibility === 'public' ? 'var(--brand-primary)' : 'var(--text-muted)',
+              borderColor: visibility === 'public' ? 'var(--brand-primary)' : undefined
+            }}
+            title={visibility === 'private' ? 'الملف خاص — اضغط لجعله عاماً' : 'الملف عام — اضغط لجعله خاصاً'}
+          >
+            {visibility === 'public' ? <Globe size={15} /> : <Lock size={15} />}
+            {visibility === 'public' ? 'عام' : 'خاص'}
+          </button>
+
+          <button
+            className="btn-magic"
             onClick={handleGenerate}
             disabled={isGenerating}
             style={{ opacity: isGenerating ? 0.7 : 1, cursor: isGenerating ? 'not-allowed' : 'pointer' }}
@@ -238,13 +291,14 @@ OUTPUT: Return ONLY the complete Markdown file. Start directly with # heading. N
             )}
             <span className="text_button">{isGenerating ? 'جاري التوليد...' : 'توليد'}</span>
           </button>
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: saveStatus.includes('فشل') ? '#ef4444' : '#10b981', fontWeight: 'bold', fontSize: '0.9rem', opacity: saveStatus ? 1 : 0, transition: 'opacity 0.3s' }}>
+            <span style={{ color: saveStatus.includes('❌') ? '#ef4444' : '#10b981', fontWeight: 'bold', fontSize: '0.85rem', opacity: saveStatus ? 1 : 0, transition: 'opacity 0.3s', whiteSpace: 'nowrap' }}>
               {saveStatus}
             </span>
             <button className="btn-primary" onClick={handleSave} disabled={saving}>
               <Save size={18} />
-              {saving ? 'جاري الرفع...' : 'حفظ التغييرات'}
+              {saving ? 'جاري الرفع...' : (isFork ? 'حفظ نسخة' : 'حفظ')}
             </button>
           </div>
         </div>

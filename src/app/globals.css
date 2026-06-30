@@ -311,30 +311,10 @@ body {
   border-bottom: 1px solid var(--border-subtle) !important;
 }
 
-.md-editor-rtl-fix .w-md-editor-text-input,
-.md-editor-rtl-fix .w-md-editor-text-pre,
-.md-editor-rtl-fix .wmde-markdown {
-  direction: rtl !important;
-  text-align: right !important;
-}
-
-.md-editor-rtl-fix .w-md-editor-text-input,
-.md-editor-rtl-fix .w-md-editor-text-pre {
-  /* Using a pure monospace font fixes the cursor misalignment and selection issues! 
-     Proportional fonts (like Cairo) cause the syntax highlighting overlay to have different 
-     character widths than the textarea, breaking the cursor position. */
-  font-family: Consolas, Monaco, 'Courier New', monospace !important;
-  font-size: 15px !important;
-  line-height: 1.6 !important;
-}
-
-/* Prevent tokens in the syntax highlighter from changing character widths, heights, or sizes and shifting the cursor */
-.md-editor-rtl-fix .w-md-editor-text-pre * {
-  font-weight: normal !important;
-  font-style: normal !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  letter-spacing: inherit !important;
+.w-md-editor-fullscreen,
+.w-md-editor-fullscreen .w-md-editor-content,
+.w-md-editor-fullscreen .wmde-markdown {
+  background-color: var(--bg-main) !important;
 }
 
 /* Generate Sparkle Button Styles */

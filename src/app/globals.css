@@ -295,42 +295,19 @@ body {
 .w-md-editor-toolbar li[data-name="theme"] {
   display: none !important; /* Hide built-in theme toggle to use our global one */
 }
-.wmde-markdown, .w-md-editor {
+.wmde-markdown {
   background-color: transparent !important;
   color: var(--text-main) !important;
+  font-family: var(--font-cairo), sans-serif !important;
+}
+.w-md-editor {
+  background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  font-family: var(--font-cairo), sans-serif !important;
 }
 .w-md-editor-toolbar {
   background-color: var(--bg-surface-solid) !important;
   border-bottom: 1px solid var(--border-subtle) !important;
-}
-
-.md-editor-rtl-fix .w-md-editor-text-input,
-.md-editor-rtl-fix .w-md-editor-text-pre,
-.md-editor-rtl-fix .wmde-markdown {
-  unicode-bidi: plaintext !important;
-  text-align: start !important;
-}
-
-.md-editor-rtl-fix .w-md-editor-text-input,
-.md-editor-rtl-fix .w-md-editor-text-pre {
-  /* Using a pure monospace font fixes the cursor misalignment and selection issues! 
-     Proportional fonts (like Cairo) cause the syntax highlighting overlay to have different 
-     character widths than the textarea, breaking the cursor position. */
-  font-family: Consolas, Monaco, 'Courier New', monospace !important;
-  font-size: 15px !important;
-  line-height: 1.6 !important;
-}
-
-/* Prevent tokens in the syntax highlighter from changing character widths, heights, or sizes and shifting the cursor */
-.md-editor-rtl-fix .w-md-editor-text-pre .token {
-  font-weight: normal !important;
-  font-style: normal !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  letter-spacing: inherit !important;
 }
 
 /* Generate Sparkle Button Styles */

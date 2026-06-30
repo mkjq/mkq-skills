@@ -407,7 +407,7 @@ OUTPUT: Return ONLY the complete Markdown file. Start with # emoji heading. No p
       </div>
 
       {/* Editor */}
-      <div data-color-mode={theme} style={{ flex: 1, overflow: 'hidden' }} dir="ltr" className="md-editor-rtl-fix">
+      <div data-color-mode={theme} style={{ flex: 1, overflow: 'hidden' }}>
         <MDEditor
           value={value}
           onChange={(val) => setValue(val || '')}

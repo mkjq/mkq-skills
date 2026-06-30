@@ -8,11 +8,13 @@ import { useSearchParams } from 'next/navigation';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import { useTheme } from './ThemeProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 export default function MarkdownEditor() {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const fileKey = searchParams.get('key');
 
@@ -45,6 +47,12 @@ export default function MarkdownEditor() {
   }, [fileKey]);
 
   const handleSave = async () => {
+    if (!user) {
+      setSaveStatus('يجب تسجيل الدخول لحفظ الملفات.');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
     setSaving(true);
     setSaveStatus('جاري الرفع للسحابة...');
     try {
@@ -53,7 +61,7 @@ export default function MarkdownEditor() {
       const response = await fetch('/api/skills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, content: value, folder })
+        body: JSON.stringify({ filename, content: value, folder, existingKey: fileKey })
       });
       const data = await response.json();
       if (data.success) {

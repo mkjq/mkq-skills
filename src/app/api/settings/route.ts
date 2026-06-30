@@ -1,7 +1,17 @@
 import { NextResponse } from 'next/server';
-import { getGlobalSettings, updateGlobalSettings, initializeD1 } from '@/lib/cloudflare';
+import { getGlobalSettings, updateGlobalSettings, initializeD1, queryD1 } from '@/lib/cloudflare';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
+
+async function verifyAdmin() {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get('auth_session')?.value;
+  if (!sessionId) return false;
+  const sql = `SELECT role FROM users WHERE session_id = ?`;
+  const users = await queryD1(sql, [sessionId]);
+  return users[0]?.role === 'admin';
+}
 
 export async function GET() {
   try {
@@ -15,6 +25,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const isAdmin = await verifyAdmin();
+    if (!isAdmin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin only' }, { status: 403 });
+    }
+    
     const body = await request.json();
     await updateGlobalSettings(body);
     return NextResponse.json({ success: true });

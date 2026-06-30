@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Download, Eye, Star, Users, Lock, Plus, RefreshCw, FileText } from 'lucide-react';
+import { Download, Eye, Star, Users, Lock, Plus, RefreshCw, FileText, Trash2, LogIn, LogOut } from 'lucide-react';
 import FolderUpload from '@/components/FolderUpload';
+import AuthModal from '@/components/AuthModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SkillFile {
   key: string;
@@ -11,14 +13,17 @@ interface SkillFile {
   size: number;
   lastModified: string;
   folder: string;
+  owner?: string;
 }
 
 export default function LibraryPage() {
-  const [activeTab, setActiveTab] = useState<'featured' | 'private' | 'public'>('featured');
+  const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState<'private' | 'public'>('public');
   const [files, setFiles] = useState<SkillFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadMsg, setUploadMsg] = useState('');
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const loadFiles = async (folder: string) => {
     setLoading(true);
@@ -35,9 +40,19 @@ export default function LibraryPage() {
   };
 
   useEffect(() => {
-    if (activeTab === 'private') loadFiles('private');
-    else if (activeTab === 'public') loadFiles('public');
-  }, [activeTab]);
+    if (activeTab === 'private') {
+      if (!user) {
+        setShowAuthModal(true);
+        setActiveTab('public');
+        return;
+      }
+      loadFiles('private');
+    } else if (activeTab === 'public') {
+      loadFiles('public');
+    } else {
+      loadFiles('featured');
+    }
+  }, [activeTab, user]);
 
   const handleDownload = (key: string, filename: string) => {
     const url = `/api/skills/download?key=${encodeURIComponent(key)}`;
@@ -49,7 +64,33 @@ export default function LibraryPage() {
     document.body.removeChild(a);
   };
 
+  const handleDelete = async (key: string, filename: string) => {
+    if (!confirm(`هل أنت متأكد من حذف الملف "${filename}" نهائياً؟`)) return;
+    
+    try {
+      const res = await fetch(`/api/skills?key=${encodeURIComponent(key)}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUploadMsg(`✅ تم حذف "${filename}" بنجاح.`);
+        loadFiles(activeTab);
+      } else {
+        setUploadMsg(`❌ خطأ: ${data.error}`);
+      }
+    } catch (err: any) {
+      setUploadMsg(`❌ فشل الاتصال: ${err.message}`);
+    } finally {
+      setTimeout(() => setUploadMsg(''), 4000);
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -89,9 +130,8 @@ export default function LibraryPage() {
   };
 
   const tabs = [
-    { id: 'featured', label: 'الملفات المميزة', icon: Star },
-    { id: 'private', label: 'المكتبة الخاصة', icon: Lock },
-    { id: 'public', label: 'العام', icon: Users },
+    { id: 'public', label: 'المكتبة العامة', icon: Users },
+    { id: 'private', label: 'ملفاتي الخاصة', icon: Lock },
   ] as const;
 
   return (
@@ -104,7 +144,23 @@ export default function LibraryPage() {
             <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: '800', letterSpacing: '-1px', marginBottom: '6px' }}>المكتبة السحابية</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>تصفح، ارفع، وحمّل ملفات المهارات والـ Prompts.</p>
           </div>
+          
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* User Auth Section */}
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--bg-surface)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                <span style={{ fontSize: '0.9rem', color: 'var(--brand-primary)', fontWeight: 'bold' }}>{user.username} {user.role === 'admin' && '(المدير)'}</span>
+                <button onClick={logout} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="تسجيل الخروج">
+                  <LogOut size={18} />
+                </button>
+              </div>
+            ) : (
+              <button className="btn-secondary" onClick={() => setShowAuthModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
+                <LogIn size={16} />
+                تسجيل الدخول
+              </button>
+            )}
+
             {uploadMsg && (
               <span style={{
                 padding: '8px 14px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600',
@@ -137,6 +193,9 @@ export default function LibraryPage() {
           </div>
         </header>
 
+        {/* Auth Modal */}
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+
         {/* Tabs */}
         <div style={{
           display: 'flex', gap: '4px', marginBottom: '32px',
@@ -149,7 +208,7 @@ export default function LibraryPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id as any)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
                   padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer',
@@ -165,59 +224,6 @@ export default function LibraryPage() {
             );
           })}
         </div>
-
-        {/* Tab: Featured */}
-        {activeTab === 'featured' && (
-          <>
-            <section style={{ marginBottom: '48px' }}>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Star size={18} color="var(--brand-primary)" />
-                الملفات المميزة
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-                {[
-                  { name: 'خبير كتابة الإعلانات.md', desc: 'مهارة مخصصة لكتابة إعلانات تسويقية احترافية بأسلوب ستيف جوبز.' },
-                  { name: 'تحليل البيانات المتقدم.md', desc: 'موجه (Prompt) ضخم لتحليل جداول البيانات وتوليد إحصائيات دقيقة.' },
-                ].map((item, i) => (
-                  <div className="library-card-featured" key={i}>
-                    <div className="card-content">
-                      <span style={{ fontWeight: '800', fontSize: '1.3rem', display: 'block', marginBottom: '8px' }}>{item.name}</span>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6' }}>{item.desc}</p>
-                    </div>
-                    <div className="card-actions">
-                      <Link href="/dashboard/editor" title="عرض الملف"><Eye size={20} color="var(--brand-primary)" /></Link>
-                      <a href="#" title="تحميل" onClick={e => e.preventDefault()}><Download size={20} color="var(--text-main)" /></a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-            <section>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '20px' }}>جميع الملفات</h2>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-                {[1, 2, 3, 4, 5, 6].map(i => (
-                  <Link href="/dashboard/editor" key={i} style={{ textDecoration: 'none' }}>
-                    <div className="library-card-normal">
-                      <div style={{ position: 'relative' }}>
-                        <div className="icon-box">
-                          <div className="line" style={{ width: '80%' }} />
-                          <div className="line" style={{ width: '60%' }} />
-                          <div className="line" style={{ width: '70%' }} />
-                        </div>
-                        <div className="status-dot" style={{ right: 'auto', left: '16px' }} />
-                      </div>
-                      <div style={{ textAlign: 'center', marginTop: 'auto', marginBottom: 'auto' }}>
-                        <p style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: '4px' }}>أوامر React</p>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>12 KB • .md</p>
-                      </div>
-                      <div className="progress-bar" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
 
         {/* Tab: Private or Public – live from R2 */}
         {(activeTab === 'private' || activeTab === 'public') && (
@@ -270,6 +276,7 @@ export default function LibraryPage() {
                         <p style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '4px', wordBreak: 'break-word' }}>{file.filename}</p>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                           {formatSize(file.size)} • {file.lastModified ? new Date(file.lastModified).toLocaleDateString('ar-SA') : '—'}
+                          {file.owner && <span style={{ marginLeft: '8px', color: 'var(--brand-primary)' }}>@{file.owner}</span>}
                         </p>
                       </div>
                     </div>
@@ -287,6 +294,17 @@ export default function LibraryPage() {
                       >
                         <Download size={14} />
                       </button>
+                      
+                      {user && (user.role === 'admin' || user.username === file.owner || (!file.owner && activeTab === 'private')) && (
+                        <button
+                          className="btn-secondary"
+                          onClick={() => handleDelete(file.key, file.filename)}
+                          style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
+                          title="حذف"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

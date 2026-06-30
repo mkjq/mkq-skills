@@ -94,6 +94,18 @@ export async function initializeD1() {
   `;
   await queryD1(sql);
 
+  const usersSql = `
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      username TEXT UNIQUE,
+      password TEXT,
+      role TEXT,
+      session_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  await queryD1(usersSql);
+
   // Insert default row if it doesn't exist
   const checkSql = `SELECT id FROM global_settings WHERE id = 'global'`;
   const result = await queryD1(checkSql);
@@ -184,6 +196,13 @@ Every Skill you produce must be:
 - Never break Markdown formatting
 - Never ignore sections of an existing Skill when improving
 - Never produce output shorter than the task genuinely requires
+- Never hallucinate, invent, or make up commands, parameters, or facts that do not exist.
+
+## ANTI-HALLUCINATION PROTOCOL
+
+1. Strict Adherence to Context: Only use facts, features, and capabilities that are explicitly defined in the user's prompt or are universally accepted technical truths.
+2. No Guesswork: If a user asks for a prompt about a specific system or software, and you are unsure of its exact capabilities, state your assumptions rather than inventing fake parameters.
+3. Grounding: Ensure every rule and constraint you write in the Skill is logically sound and practically executable by an LLM.
 
 ## FINAL DIRECTIVE
 
@@ -194,7 +213,17 @@ Your mission: make every AI Skill on this platform 10x more powerful than what t
       VALUES ('global', '1010', '', '', ?)
     `;
     await queryD1(insertSql, [defaultPrompt]);
+  }
 
+  // Insert admin user if not exists
+  const checkAdminSql = `SELECT id FROM users WHERE username = 'M'`;
+  const adminResult = await queryD1(checkAdminSql);
+  if (adminResult.length === 0) {
+    const insertAdminSql = `
+      INSERT INTO users (id, username, password, role)
+      VALUES (?, 'M', '1010', 'admin')
+    `;
+    await queryD1(insertAdminSql, [crypto.randomUUID()]);
   }
 }
 

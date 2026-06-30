@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Lock, Save, Key, Bot, ShieldAlert } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 
 export default function SettingsPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -33,20 +34,12 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    loadSettings();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordInput === settings.adminPassword) {
-      setIsAuthenticated(true);
-      setMessage('');
-    } else {
-      setMessage('كلمة المرور غير صحيحة!');
-      setTimeout(() => setMessage(''), 3000);
+    if (user && user.role === 'admin') {
+      loadSettings();
+    } else if (!authLoading) {
+      setLoading(false);
     }
-  };
+  }, [user, authLoading]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,42 +65,27 @@ export default function SettingsPage() {
     }
   };
 
-  if (loading) {
+  if (authLoading || (loading && user?.role === 'admin')) {
     return (
       <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>جاري المزامنة السحابية...</span>
+        <span style={{ color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>جاري التحقق من الصلاحيات...</span>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user || user.role !== 'admin') {
     return (
       <div style={{ display: 'flex', height: 'calc(100vh - 80px)', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, var(--bg-surface), var(--bg-app))' }}>
-        <form onSubmit={handleLogin} className="glass-panel" style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '350px' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--bg-surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Lock size={32} color="var(--brand-primary)" />
+        <div className="glass-panel" style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '350px', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShieldAlert size={32} color="#ef4444" />
           </div>
-          <h2 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.5rem' }}>بوابة المدير</h2>
-          
-          <input 
-            type="password" 
-            placeholder="كلمة المرور..." 
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            style={{ 
-              width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-subtle)',
-              background: 'var(--bg-surface-solid)', color: 'var(--text-main)', outline: 'none',
-              textAlign: 'center', letterSpacing: '4px', fontSize: '1.2rem'
-            }}
-            autoFocus
-          />
-          
-          {message && <span style={{ color: '#ef4444', fontSize: '0.9rem' }}>{message}</span>}
-          
-          <button type="submit" className="btn-primary" style={{ width: '100%', padding: '12px' }}>
-            دخول
-          </button>
-        </form>
+          <h2 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.5rem' }}>غير مصرح</h2>
+          <p style={{ color: 'var(--text-muted)' }}>عذراً، هذه الصفحة مخصصة لمدير النظام فقط.</p>
+          <Link href="/dashboard" style={{ width: '100%' }}>
+            <button className="btn-primary" style={{ width: '100%', padding: '12px' }}>العودة للمكتبة</button>
+          </Link>
+        </div>
       </div>
     );
   }

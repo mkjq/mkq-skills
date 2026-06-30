@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Download, Eye, Star, Upload, Users, Lock, Plus, RefreshCw, FileText } from 'lucide-react';
+import { Download, Eye, Star, Users, Lock, Plus, RefreshCw, FileText } from 'lucide-react';
+import FolderUpload from '@/components/FolderUpload';
 
 interface SkillFile {
   key: string;
@@ -18,7 +19,6 @@ export default function LibraryPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadMsg, setUploadMsg] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadFiles = async (folder: string) => {
     setLoading(true);
@@ -79,7 +79,6 @@ export default function LibraryPage() {
     } finally {
       setUploading(false);
       setTimeout(() => setUploadMsg(''), 4000);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -105,7 +104,7 @@ export default function LibraryPage() {
             <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: '800', letterSpacing: '-1px', marginBottom: '6px' }}>المكتبة السحابية</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>تصفح، ارفع، وحمّل ملفات المهارات والـ Prompts.</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
             {uploadMsg && (
               <span style={{
                 padding: '8px 14px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600',
@@ -118,23 +117,7 @@ export default function LibraryPage() {
             )}
             {(activeTab === 'private' || activeTab === 'public') && (
               <>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".md,.txt,.markdown"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                  id="file-upload-input"
-                />
-                <button
-                  className="btn-secondary"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}
-                >
-                  <Upload size={16} />
-                  {uploading ? 'جاري الرفع...' : 'رفع ملف'}
-                </button>
+                <FolderUpload onChange={handleFileUpload} uploading={uploading} />
                 <button
                   className="btn-secondary"
                   onClick={() => loadFiles(activeTab)}

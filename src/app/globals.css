@@ -316,9 +316,19 @@ body {
 
 .md-editor-rtl-fix .w-md-editor-text-input,
 .md-editor-rtl-fix .w-md-editor-text-pre {
-  font-family: var(--font-cairo), monospace !important;
-  font-size: calc(16px * var(--font-scale)) !important;
+  /* Using a pure monospace font fixes the cursor misalignment and selection issues! 
+     Proportional fonts (like Cairo) cause the syntax highlighting overlay to have different 
+     character widths than the textarea, breaking the cursor position. */
+  font-family: Consolas, Monaco, 'Courier New', monospace !important;
+  font-size: 15px !important;
   line-height: 1.6 !important;
+}
+
+/* Prevent bold/italic in the syntax highlighter from changing character widths and shifting the cursor */
+.md-editor-rtl-fix .w-md-editor-text-pre .token.bold,
+.md-editor-rtl-fix .w-md-editor-text-pre .token.italic {
+  font-weight: normal !important;
+  font-style: normal !important;
 }
 
 /* Generate Sparkle Button Styles */

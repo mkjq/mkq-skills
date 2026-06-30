@@ -82,13 +82,62 @@ export default function MarkdownEditor() {
     if (!value.trim()) return;
     
     setIsGenerating(true);
-    setValue('جاري التفكير...\n\n'); // Clear and show loading state
+    setValue('⏳ جاري التفكير وبناء المهارة...\n\n');
     
+    // Detect if user wrote a description/request or an existing partial skill
+    const isExistingSkill = value.trim().startsWith('#');
+    
+    const aiPrompt = isExistingSkill
+      ? `You are given an existing AI Skill file in Markdown format. Your task is to IMPROVE and COMPLETE it to become a world-class, production-ready Skill file.
+
+EXISTING SKILL:
+\`\`\`markdown
+${value}
+\`\`\`
+
+INSTRUCTIONS:
+1. Keep the original intent and purpose of the skill
+2. Rewrite vague or incomplete instructions with crystal-clear precision
+3. Add missing sections (Role, Constraints, Examples, Edge Cases, Output Format, Tone & Style)
+4. Strengthen the role definition — make the AI identity unmistakable
+5. Add explicit constraints (what NOT to do)
+6. Add at least 2 concrete input/output examples
+7. Ensure the output format is explicitly defined
+8. Fix any Markdown formatting issues
+
+OUTPUT: Return ONLY the complete improved Markdown file, nothing else. Start directly with the # heading.`
+      : `You are given a user request or description for a new AI Skill. Your task is to generate a complete, world-class, production-ready AI Skill file in Markdown format.
+
+USER REQUEST:
+"${value}"
+
+INSTRUCTIONS:
+Generate a complete Skill file with ALL of the following sections, in this exact order:
+1. # [Skill Name] — Clear, descriptive title
+2. ## Overview — 2-3 sentences describing what this skill does
+3. ## Role & Identity — Who the AI IS and its persona
+4. ## Core Responsibilities — Numbered list of primary tasks
+5. ## Behavioral Guidelines — How the AI should behave and respond
+6. ## Constraints — Explicit list of what the AI must NEVER do
+7. ## Input Format — What the user provides
+8. ## Output Format — Exact structure of every response
+9. ## Tone & Style — Communication style
+10. ## Examples — At least 2-3 realistic input/output pairs
+11. ## Edge Cases — How to handle ambiguous or difficult inputs
+
+RULES:
+- Write EVERY section fully — no placeholders, no "to be filled" text
+- Make the skill immediately usable in GPT-4, Claude, DeepSeek, Gemini
+- Be specific, not generic — avoid vague instructions like "be helpful"
+- Use proper Markdown formatting with headers, bullet lists, bold text, code blocks where needed
+
+OUTPUT: Return ONLY the complete Markdown file. Start directly with # heading. No preamble, no explanation.`;
+
     try {
       const response = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: value })
+        body: JSON.stringify({ prompt: aiPrompt })
       });
 
       if (!response.ok) {
@@ -103,7 +152,7 @@ export default function MarkdownEditor() {
       let done = false;
       let generatedText = '';
 
-      setValue(''); // Clear "جاري التفكير..." before streaming starts
+      setValue(''); // Clear loading message before streaming starts
 
       while (!done) {
         const { value: chunk, done: readerDone } = await reader.read();

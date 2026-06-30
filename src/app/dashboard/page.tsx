@@ -250,44 +250,112 @@ export default function LibraryPage() {
                 <p style={{ fontSize: '0.9rem' }}>اضغط "رفع ملف" أو "إنشاء مهارة" لإضافة أول ملف</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                 {files.map(file => (
-                  <div key={file.key} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div key={file.key} style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '18px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'default',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--brand-primary)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(0,0,0,0.4), 0 0 20px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.08)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  }}
+                  >
+                    {/* Glow accent top-right */}
+                    <div style={{
+                      position: 'absolute', top: 0, right: 0,
+                      width: '80px', height: '80px',
+                      background: 'var(--brand-glow)',
+                      borderRadius: '50%',
+                      filter: 'blur(40px)',
+                      opacity: 0.5,
+                      pointerEvents: 'none',
+                    }} />
+
+                    {/* Header */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', position: 'relative' }}>
                       <div style={{
-                        width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
-                        background: 'var(--brand-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        width: '46px', height: '46px', borderRadius: '12px', flexShrink: 0,
+                        background: 'linear-gradient(135deg, var(--brand-primary), color-mix(in srgb, var(--brand-primary) 50%, #6366f1))',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 4px 12px var(--brand-glow)',
                       }}>
-                        <FileText size={20} color="var(--brand-primary)" />
+                        <FileText size={22} color="#fff" />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '4px', wordBreak: 'break-word' }}>{file.filename}</p>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                          {formatSize(file.size)} • {file.lastModified ? new Date(file.lastModified).toLocaleDateString('ar-SA') : '—'}
-                          {file.owner && <span style={{ marginLeft: '8px', color: 'var(--brand-primary)' }}>@{file.owner}</span>}
-                        </p>
+                        <p style={{
+                          fontWeight: '700', fontSize: '1rem', marginBottom: '6px',
+                          wordBreak: 'break-word', color: 'var(--text-main)',
+                          lineHeight: '1.3',
+                        }}>{file.filename}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span style={{
+                            fontSize: '0.75rem', color: 'var(--text-muted)',
+                            background: 'rgba(255,255,255,0.05)',
+                            padding: '2px 8px', borderRadius: '20px',
+                            border: '1px solid rgba(255,255,255,0.08)'
+                          }}>
+                            {formatSize(file.size)}
+                          </span>
+                          {file.lastModified && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              {new Date(file.lastModified).toLocaleDateString('ar-SA')}
+                            </span>
+                          )}
+                          {file.owner && (
+                            <span style={{
+                              fontSize: '0.75rem', color: 'var(--brand-primary)',
+                              fontWeight: '600',
+                            }}>@{file.owner}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+
+                    {/* Divider */}
+                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+
+                    {/* Actions */}
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       <Link href={`/dashboard/editor?key=${encodeURIComponent(file.key)}`} style={{ textDecoration: 'none', flex: 1 }}>
-                        <button className="btn-secondary" style={{ width: '100%', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <button className="btn-primary" style={{
+                          width: '100%', padding: '9px 12px', fontSize: '0.85rem',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                        }}>
                           <Eye size={14} /> عرض وتعديل
                         </button>
                       </Link>
                       <button
                         className="btn-secondary"
                         onClick={() => handleDownload(file.key, file.filename || 'file.md')}
-                        style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                        style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
                         title="تحميل"
                       >
                         <Download size={14} />
                       </button>
-                      
                       {user && (user.role === 'admin' || user.username === file.owner || (!file.owner && activeTab === 'private')) && (
                         <button
                           className="btn-secondary"
                           onClick={() => handleDelete(file.key, file.filename)}
-                          style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
+                          style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
                           title="حذف"
                         >
                           <Trash2 size={14} />

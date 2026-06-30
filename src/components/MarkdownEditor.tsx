@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Save, Bot, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Save, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import { useTheme } from './ThemeProvider';
@@ -12,57 +13,70 @@ const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 export default function MarkdownEditor() {
   const { theme } = useTheme();
-  const [value, setValue] = useState("");
-  const [filename, setFilename] = useState("مهارة جديدة.md");
+  const searchParams = useSearchParams();
+  const fileKey = searchParams.get('key');
+
+  const [value, setValue] = useState('');
+  const [filename, setFilename] = useState('مهارة جديدة.md');
   const [isClient, setIsClient] = useState(false);
-  const [saveStatus, setSaveStatus] = useState("");
+  const [saveStatus, setSaveStatus] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loadingFile, setLoadingFile] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    setValue("# מهارة جديدة\n\nاكتب المحتوى الخاص بك هنا...");
   }, []);
+
+  // Load file from R2 if key param is present
+  useEffect(() => {
+    if (!fileKey) {
+      setValue('# مهارة جديدة\n\nاكتب المحتوى الخاص بك هنا...');
+      return;
+    }
+    setLoadingFile(true);
+    const fname = fileKey.split('/').pop() || 'file.md';
+    setFilename(fname);
+    fetch(`/api/skills/download?key=${encodeURIComponent(fileKey)}`)
+      .then(r => r.text())
+      .then(text => setValue(text))
+      .catch(() => setValue('# فشل تحميل الملف'))
+      .finally(() => setLoadingFile(false));
+  }, [fileKey]);
 
   const handleSave = async () => {
     setSaving(true);
-    setSaveStatus("جاري الرفع للسحابة...");
+    setSaveStatus('جاري الرفع للسحابة...');
     try {
+      // Determine folder from the key (if editing existing file) or default to private
+      const folder = fileKey ? fileKey.split('/')[0] : 'private';
       const response = await fetch('/api/skills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, content: value })
+        body: JSON.stringify({ filename, content: value, folder })
       });
       const data = await response.json();
       if (data.success) {
-        setSaveStatus("تم الحفظ في Cloudflare R2!");
+        setSaveStatus('تم الحفظ في Cloudflare R2!');
       } else {
         throw new Error(data.error);
       }
     } catch (err: any) {
       console.error(err);
-      setSaveStatus("فشل الحفظ: " + err.message);
+      setSaveStatus('فشل الحفظ: ' + err.message);
     } finally {
       setSaving(false);
-      setTimeout(() => setSaveStatus(""), 3000);
+      setTimeout(() => setSaveStatus(''), 3000);
     }
   };
 
-  if (!isClient) return (
+  if (!isClient || loadingFile) return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
       <div className="spinner-container">
-        <div className="spinner">
-          <div className="spinner">
-            <div className="spinner">
-              <div className="spinner">
-                <div className="spinner">
-                  <div className="spinner" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="spinner"><div className="spinner"><div className="spinner" /></div></div>
       </div>
-      <span style={{ marginTop: '20px', fontSize: '1rem', letterSpacing: '1px', fontWeight: '600', color: 'var(--brand-primary)' }}>جاري تحميل المحرر...</span>
+      <span style={{ marginTop: '20px', fontSize: '1rem', fontWeight: '600', color: 'var(--brand-primary)' }}>
+        {loadingFile ? 'جاري تحميل الملف من السحابة...' : 'جاري تحميل المحرر...'}
+      </span>
     </div>
   );
 
@@ -78,23 +92,18 @@ export default function MarkdownEditor() {
         backgroundColor: 'var(--bg-surface-solid)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-          <Link href="/dashboard" style={{ color: 'var(--text-muted)', fontWeight: '600', textDecoration: 'none' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--brand-primary)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-muted)'}>المكتبة</Link>
-          <ChevronLeft size={16} color="var(--text-muted)" /> {/* Natively points left in LTR, acts as right arrow in RTL context if not flipped, actually we'll just use ChevronLeft to point left for hierarchy */}
-          <input 
+          <Link href="/dashboard" style={{ color: 'var(--text-muted)', fontWeight: '600', textDecoration: 'none' }}
+            onMouseOver={e => e.currentTarget.style.color = 'var(--brand-primary)'}
+            onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+            المكتبة
+          </Link>
+          <ChevronLeft size={16} color="var(--text-muted)" />
+          <input
             type="text"
             value={filename}
-            onChange={(e) => setFilename(e.target.value)}
+            onChange={e => setFilename(e.target.value)}
             className="input-field"
-            style={{ 
-              background: 'transparent', 
-              border: '1px solid transparent',
-              color: 'var(--text-main)', 
-              fontSize: '1.2rem', 
-              fontWeight: '700', 
-              boxShadow: 'none',
-              maxWidth: '350px',
-              padding: '8px 12px'
-            }}
+            style={{ background: 'transparent', border: '1px solid transparent', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '700', boxShadow: 'none', maxWidth: '320px', padding: '8px 10px' }}
           />
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>

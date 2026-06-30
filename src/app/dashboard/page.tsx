@@ -1,95 +1,317 @@
+"use client";
+
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Download, Eye, Star } from 'lucide-react';
+import { Download, Eye, Star, Upload, Users, Lock, Plus, RefreshCw, FileText } from 'lucide-react';
+
+interface SkillFile {
+  key: string;
+  filename: string;
+  size: number;
+  lastModified: string;
+  folder: string;
+}
 
 export default function LibraryPage() {
+  const [activeTab, setActiveTab] = useState<'featured' | 'private' | 'public'>('featured');
+  const [files, setFiles] = useState<SkillFile[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadFiles = async (folder: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/skills?folder=${folder}`);
+      const data = await res.json();
+      if (data.success) setFiles(data.files || []);
+      else setFiles([]);
+    } catch {
+      setFiles([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'private') loadFiles('private');
+    else if (activeTab === 'public') loadFiles('public');
+  }, [activeTab]);
+
+  const handleDownload = (key: string, filename: string) => {
+    const url = `/api/skills/download?key=${encodeURIComponent(key)}`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const folder = activeTab === 'public' ? 'public' : 'private';
+    setUploading(true);
+    setUploadMsg('جاري الرفع...');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', folder);
+
+      const res = await fetch('/api/skills/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setUploadMsg(`✅ تم رفع "${data.filename}" بنجاح!`);
+        loadFiles(folder);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err: any) {
+      setUploadMsg(`❌ فشل الرفع: ${err.message}`);
+    } finally {
+      setUploading(false);
+      setTimeout(() => setUploadMsg(''), 4000);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const formatSize = (bytes: number) => {
+    if (!bytes) return '—';
+    if (bytes < 1024) return `${bytes} B`;
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  };
+
+  const tabs = [
+    { id: 'featured', label: 'الملفات المميزة', icon: Star },
+    { id: 'private', label: 'المكتبة الخاصة', icon: Lock },
+    { id: 'public', label: 'العام', icon: Users },
+  ] as const;
+
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '40px', position: 'relative', zIndex: 10 }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: '32px', position: 'relative', zIndex: 10 }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        
-        <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+        {/* Header */}
+        <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: '800', letterSpacing: '-1px', marginBottom: '8px' }}>المكتبة السحابية</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>تصفح وحمل أفضل ملفات الذكاء الاصطناعي المحفوظة.</p>
+            <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: '800', letterSpacing: '-1px', marginBottom: '6px' }}>المكتبة السحابية</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>تصفح، ارفع، وحمّل ملفات المهارات والـ Prompts.</p>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            {uploadMsg && (
+              <span style={{
+                padding: '8px 14px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600',
+                background: uploadMsg.startsWith('✅') ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                color: uploadMsg.startsWith('✅') ? '#10b981' : '#ef4444',
+                border: `1px solid ${uploadMsg.startsWith('✅') ? '#10b981' : '#ef4444'}`,
+              }}>
+                {uploadMsg}
+              </span>
+            )}
+            {(activeTab === 'private' || activeTab === 'public') && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".md,.txt,.markdown"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                  id="file-upload-input"
+                />
+                <button
+                  className="btn-secondary"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}
+                >
+                  <Upload size={16} />
+                  {uploading ? 'جاري الرفع...' : 'رفع ملف'}
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={() => loadFiles(activeTab)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px' }}
+                  title="تحديث"
+                >
+                  <RefreshCw size={16} />
+                </button>
+              </>
+            )}
+            <Link href="/dashboard/editor" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
+                <Plus size={16} />
+                إنشاء مهارة
+              </button>
+            </Link>
           </div>
         </header>
 
-        {/* Featured Files Section */}
-        <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Star size={20} color="var(--brand-primary)" />
-            الملفات المميزة
-          </h2>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
-            {/* Featured Card 1 */}
-            <div className="library-card-featured">
-              <div className="card-content">
-                <span style={{ fontWeight: '800', fontSize: '1.6rem', display: 'block', marginBottom: '8px' }}>خبير كتابة الإعلانات.md</span>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>مهارة مخصصة لكتابة إعلانات تسويقية احترافية بأسلوب ستيف جوبز.</p>
-              </div>
-              <div className="card-actions">
-                <Link href="/dashboard/editor" title="عرض الملف">
-                   <Eye size={22} color="var(--brand-primary)" />
-                </Link>
-                <a href="#" title="تحميل">
-                   <Download size={22} color="var(--text-main)" />
-                </a>
-              </div>
-            </div>
-            
-            {/* Featured Card 2 */}
-            <div className="library-card-featured">
-              <div className="card-content">
-                <span style={{ fontWeight: '800', fontSize: '1.6rem', display: 'block', marginBottom: '8px' }}>تحليل البيانات المتقدم.md</span>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>موجه (Prompt) ضخم لتحليل جداول البيانات وتوليد إحصائيات دقيقة.</p>
-              </div>
-              <div className="card-actions">
-                <Link href="/dashboard/editor" title="عرض الملف">
-                   <Eye size={22} color="var(--brand-primary)" />
-                </Link>
-                <a href="#" title="تحميل">
-                   <Download size={22} color="var(--text-main)" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Tabs */}
+        <div style={{
+          display: 'flex', gap: '4px', marginBottom: '32px',
+          background: 'var(--bg-surface)', borderRadius: '12px', padding: '4px',
+          width: 'fit-content', border: '1px solid var(--border-subtle)'
+        }}>
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontWeight: '600', fontSize: '0.95rem',
+                  background: isActive ? 'var(--brand-primary)' : 'transparent',
+                  color: isActive ? '#fff' : 'var(--text-muted)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Icon size={16} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
-        {/* Regular Files Section */}
-        <section>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '24px' }}>جميع الملفات</h2>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-            
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Link href="/dashboard/editor" key={i} style={{ textDecoration: 'none' }}>
-                <div className="library-card-normal">
-                  <div style={{ position: 'relative' }}>
-                    <div className="icon-box">
-                      <div className="line" style={{ width: '80%' }}></div>
-                      <div className="line" style={{ width: '60%' }}></div>
-                      <div className="line" style={{ width: '70%' }}></div>
+        {/* Tab: Featured */}
+        {activeTab === 'featured' && (
+          <>
+            <section style={{ marginBottom: '48px' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Star size={18} color="var(--brand-primary)" />
+                الملفات المميزة
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                {[
+                  { name: 'خبير كتابة الإعلانات.md', desc: 'مهارة مخصصة لكتابة إعلانات تسويقية احترافية بأسلوب ستيف جوبز.' },
+                  { name: 'تحليل البيانات المتقدم.md', desc: 'موجه (Prompt) ضخم لتحليل جداول البيانات وتوليد إحصائيات دقيقة.' },
+                ].map((item, i) => (
+                  <div className="library-card-featured" key={i}>
+                    <div className="card-content">
+                      <span style={{ fontWeight: '800', fontSize: '1.3rem', display: 'block', marginBottom: '8px' }}>{item.name}</span>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6' }}>{item.desc}</p>
                     </div>
-                    <div className="status-dot" style={{ right: 'auto', left: '16px' }}></div> {/* Logical left in RTL */}
+                    <div className="card-actions">
+                      <Link href="/dashboard/editor" title="عرض الملف"><Eye size={20} color="var(--brand-primary)" /></Link>
+                      <a href="#" title="تحميل" onClick={e => e.preventDefault()}><Download size={20} color="var(--text-main)" /></a>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </section>
+            <section>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '20px' }}>جميع الملفات</h2>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <Link href="/dashboard/editor" key={i} style={{ textDecoration: 'none' }}>
+                    <div className="library-card-normal">
+                      <div style={{ position: 'relative' }}>
+                        <div className="icon-box">
+                          <div className="line" style={{ width: '80%' }} />
+                          <div className="line" style={{ width: '60%' }} />
+                          <div className="line" style={{ width: '70%' }} />
+                        </div>
+                        <div className="status-dot" style={{ right: 'auto', left: '16px' }} />
+                      </div>
+                      <div style={{ textAlign: 'center', marginTop: 'auto', marginBottom: 'auto' }}>
+                        <p style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: '4px' }}>أوامر React</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>12 KB • .md</p>
+                      </div>
+                      <div className="progress-bar" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
 
-                  <div style={{ textAlign: 'center', marginTop: 'auto', marginBottom: 'auto' }}>
-                    <p style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--text-main)', marginBottom: '4px' }}>
-                      أوامر React
-                    </p>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      12 KB • .md
-                    </p>
-                  </div>
+        {/* Tab: Private or Public – live from R2 */}
+        {(activeTab === 'private' || activeTab === 'public') && (
+          <section>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              {activeTab === 'public'
+                ? <><Users size={18} color="var(--brand-primary)" /><h2 style={{ fontSize: '1.3rem', fontWeight: '700', margin: 0 }}>الملفات العامة — مفتوحة للجميع</h2></>
+                : <><Lock size={18} color="var(--brand-primary)" /><h2 style={{ fontSize: '1.3rem', fontWeight: '700', margin: 0 }}>ملفاتي الخاصة</h2></>
+              }
+            </div>
 
-                  <div className="progress-bar"></div>
+            {activeTab === 'public' && (
+              <div style={{
+                padding: '14px 20px', borderRadius: '10px', marginBottom: '24px',
+                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)',
+                color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6'
+              }}>
+                🌍 هذا القسم مفتوح للجميع. يمكن لأي شخص رفع ملفات .md أو .txt وتعديلها مجاناً بدون تسجيل دخول. كن محترماً مع مشاركات الآخرين!
+              </div>
+            )}
+
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
+                <div className="spinner-container" style={{ width: '60px', height: '60px', margin: '0 auto 16px' }}>
+                  <div className="spinner" />
                 </div>
-              </Link>
-            ))}
+                <p>جاري التحميل من السحابة...</p>
+              </div>
+            ) : files.length === 0 ? (
+              <div style={{
+                textAlign: 'center', padding: '60px', borderRadius: '16px',
+                border: '2px dashed var(--border-strong)', color: 'var(--text-muted)'
+              }}>
+                <FileText size={48} style={{ marginBottom: '16px', opacity: 0.4 }} />
+                <p style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '8px' }}>لا توجد ملفات بعد</p>
+                <p style={{ fontSize: '0.9rem' }}>اضغط "رفع ملف" أو "إنشاء مهارة" لإضافة أول ملف</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                {files.map(file => (
+                  <div key={file.key} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                      <div style={{
+                        width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
+                        background: 'var(--brand-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        <FileText size={20} color="var(--brand-primary)" />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '4px', wordBreak: 'break-word' }}>{file.filename}</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                          {formatSize(file.size)} • {file.lastModified ? new Date(file.lastModified).toLocaleDateString('ar-SA') : '—'}
+                        </p>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                      <Link href={`/dashboard/editor?key=${encodeURIComponent(file.key)}`} style={{ textDecoration: 'none', flex: 1 }}>
+                        <button className="btn-secondary" style={{ width: '100%', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                          <Eye size={14} /> عرض وتعديل
+                        </button>
+                      </Link>
+                      <button
+                        className="btn-secondary"
+                        onClick={() => handleDownload(file.key, file.filename || 'file.md')}
+                        style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                        title="تحميل"
+                      >
+                        <Download size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
-          </div>
-        </section>
-        
       </div>
     </div>
   );

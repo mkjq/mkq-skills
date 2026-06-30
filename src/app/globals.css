@@ -311,10 +311,36 @@ body {
   border-bottom: 1px solid var(--border-subtle) !important;
 }
 
-.w-md-editor-fullscreen,
-.w-md-editor-fullscreen .w-md-editor-content,
-.w-md-editor-fullscreen .wmde-markdown {
+/* Fix Fullscreen Transparency */
+.w-md-editor-fullscreen {
   background-color: var(--bg-main) !important;
+  z-index: 99999 !important;
+}
+.w-md-editor-fullscreen .w-md-editor-content,
+.w-md-editor-fullscreen .wmde-markdown,
+.w-md-editor-fullscreen .w-md-editor-text {
+  background-color: var(--bg-main) !important;
+}
+
+/* Fix Editor alignment for Arabic while keeping LTR split-pane layout to avoid overlapping */
+.md-editor-rtl-fix .w-md-editor-text-input,
+.md-editor-rtl-fix .w-md-editor-text-pre {
+  text-align: right !important;
+  direction: ltr !important; 
+}
+
+/* Ensure tokens in syntax highlighter match textarea font exactly to prevent vertical desync */
+.md-editor-rtl-fix .w-md-editor-text-pre * {
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  font-family: Consolas, Monaco, 'Courier New', monospace !important;
+}
+.md-editor-rtl-fix .w-md-editor-text-input {
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  font-family: Consolas, Monaco, 'Courier New', monospace !important;
 }
 
 /* Generate Sparkle Button Styles */

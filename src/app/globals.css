@@ -302,6 +302,10 @@ body {
   box-shadow: none !important;
   font-family: var(--font-cairo), sans-serif !important;
 }
+.w-md-editor.w-md-editor-fullscreen {
+  background-color: var(--bg-main) !important; /* Solid background when fullscreen */
+  z-index: 9999 !important; /* Ensure it covers everything else */
+}
 .w-md-editor-toolbar {
   background-color: var(--bg-surface-solid) !important;
   border-bottom: 1px solid var(--border-subtle) !important;

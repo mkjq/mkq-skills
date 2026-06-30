@@ -44,6 +44,9 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: isOpenRouter ? 'google/gemini-2.5-pro' : 'deepseek-chat', // Use deepseek-chat as default fallback
         stream: true,
+        temperature: 0.1, // Low temperature to reduce hallucination
+        top_p: 0.9,
+        presence_penalty: 0.1,
         messages: [
           { role: 'system', content: settings.aiSystemPrompt || 'You are an AI assistant.' },
           { role: 'user', content: prompt }

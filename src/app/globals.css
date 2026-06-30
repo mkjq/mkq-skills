@@ -310,8 +310,8 @@ body {
 .md-editor-rtl-fix .w-md-editor-text-input,
 .md-editor-rtl-fix .w-md-editor-text-pre,
 .md-editor-rtl-fix .wmde-markdown {
-  unicode-bidi: plaintext !important;
-  text-align: start !important;
+  direction: rtl !important;
+  text-align: right !important;
 }
 
 .md-editor-rtl-fix .w-md-editor-text-input,

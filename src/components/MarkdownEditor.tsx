@@ -19,7 +19,9 @@ export default function MarkdownEditor() {
   const fileKey = searchParams.get('key');
 
   const [value, setValue] = useState('');
+  const [originalValue, setOriginalValue] = useState('');
   const [filename, setFilename] = useState('مهارة جديدة.md');
+  const [originalFilename, setOriginalFilename] = useState('مهارة جديدة.md');
   const [isClient, setIsClient] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [saving, setSaving] = useState(false);
@@ -62,7 +64,11 @@ export default function MarkdownEditor() {
 
     fetch(`/api/skills/download?key=${encodeURIComponent(fileKey)}`)
       .then(r => r.text())
-      .then(text => setValue(text))
+      .then(text => {
+        setValue(text);
+        setOriginalValue(text);
+        setOriginalFilename(fname);
+      })
       .catch(() => setValue('# فشل تحميل الملف'))
       .finally(() => setLoadingFile(false));
   }, [fileKey, user]);
@@ -98,6 +104,8 @@ export default function MarkdownEditor() {
       if (data.success) {
         setSaveStatus(isFork ? '✅ تم حفظ نسخة في مكتبتك!' : '✅ تم الحفظ في السحابة!');
         setIsFork(false); // After fork save, it's now the user's own file
+        setOriginalValue(value);
+        setOriginalFilename(filename);
       } else {
         throw new Error(data.error);
       }
@@ -311,11 +319,33 @@ OUTPUT: Return ONLY the complete Markdown file. Start with # emoji heading. No p
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Fork notice */}
-          {isFork && (
+          {isFork && value !== originalValue && (
             <span style={{ fontSize: '0.8rem', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', padding: '4px 10px', borderRadius: '6px' }}>
-              ✂️ نسخة مُعدَّلة — ستُحفظ في مكتبتك
+              ✂️ نسخة مُعدَّلة — ستُحفظ كنسخة خاصة في مكتبتك
             </span>
           )}
+
+          {/* Undo / Redo */}
+          <div style={{ display: 'flex', border: '1px solid var(--border-subtle)', borderRadius: '8px', overflow: 'hidden' }}>
+            <button
+              onClick={() => { const el = document.querySelector('.w-md-editor-text-input') as HTMLTextAreaElement; if (el) { el.focus(); document.execCommand('undo'); } }}
+              style={{ background: 'var(--bg-surface-solid)', border: 'none', padding: '8px 12px', cursor: 'pointer', color: 'var(--text-main)', borderLeft: '1px solid var(--border-subtle)' }}
+              title="تراجع (Ctrl+Z)"
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--border-subtle)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-surface-solid)'}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+            </button>
+            <button
+              onClick={() => { const el = document.querySelector('.w-md-editor-text-input') as HTMLTextAreaElement; if (el) { el.focus(); document.execCommand('redo'); } }}
+              style={{ background: 'var(--bg-surface-solid)', border: 'none', padding: '8px 12px', cursor: 'pointer', color: 'var(--text-main)' }}
+              title="إعادة (Ctrl+Y)"
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--border-subtle)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-surface-solid)'}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+            </button>
+          </div>
 
           {/* Visibility toggle */}
           <button
@@ -352,7 +382,23 @@ OUTPUT: Return ONLY the complete Markdown file. Start with # emoji heading. No p
             <span style={{ color: saveStatus.includes('❌') ? '#ef4444' : '#10b981', fontWeight: 'bold', fontSize: '0.85rem', opacity: saveStatus ? 1 : 0, transition: 'opacity 0.3s', whiteSpace: 'nowrap' }}>
               {saveStatus}
             </span>
-            <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            
+            {(value !== originalValue || filename !== originalFilename) && (
+              <button 
+                className="btn-secondary" 
+                onClick={() => {
+                  if (confirm('هل أنت متأكد من إلغاء جميع التعديلات والعودة للنص الأصلي؟')) {
+                    setValue(originalValue);
+                    setFilename(originalFilename);
+                  }
+                }} 
+                style={{ padding: '8px 14px', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
+              >
+                إلغاء التعديلات
+              </button>
+            )}
+
+            <button className="btn-primary" onClick={handleSave} disabled={saving || (value === originalValue && filename === originalFilename && !isFork)}>
               <Save size={18} />
               {saving ? 'جاري الرفع...' : (isFork ? 'حفظ نسخة' : 'حفظ')}
             </button>

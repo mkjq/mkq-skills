@@ -29,19 +29,6 @@ export default function RootLayout({
               <div className="app-content-wrapper">
                  {children}
               </div>
-              <footer style={{
-                width: '100%',
-                padding: '12px',
-                display: 'flex',
-                justifyContent: 'center',
-                borderTop: '1px solid var(--border-subtle)',
-                backgroundColor: 'var(--bg-surface-solid)',
-                zIndex: 10
-              }}>
-                <Link href="/about" className="footer-link">
-                  من نحن
-                </Link>
-              </footer>
             </div>
             <ThemeCustomizer />
           </AuthProvider>

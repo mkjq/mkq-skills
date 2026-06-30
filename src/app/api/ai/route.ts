@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const isOpenRouter = !!settings.openRouterApiKey;
     const endpoint = isOpenRouter 
       ? 'https://openrouter.ai/api/v1/chat/completions'
-      : 'https://api.openai.com/v1/chat/completions'; // Fallback to OpenAI compatible
+      : 'https://api.deepseek.com/chat/completions'; // Fallback to DeepSeek
 
     const headers: any = {
       'Authorization': `Bearer ${apiKey}`,
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        model: isOpenRouter ? 'google/gemini-2.5-pro' : 'gpt-4o', // default models
+        model: isOpenRouter ? 'google/gemini-2.5-pro' : 'deepseek-chat', // Use deepseek-chat as default fallback
         stream: true,
         messages: [
           { role: 'system', content: settings.aiSystemPrompt || 'You are an AI assistant.' },

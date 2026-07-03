@@ -181,6 +181,7 @@ export default function LibraryPage() {
                     <img
                       src={book.coverImage}
                       alt={book.title}
+                      className="book-cover-img"
                       style={{
                         width: '100%',
                         height: '100%',
@@ -188,8 +189,6 @@ export default function LibraryPage() {
                         opacity: 0.9,
                         transition: 'transform 0.3s',
                       }}
-                      onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-                      onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                     />
                   </div>
 
@@ -296,6 +295,9 @@ export default function LibraryPage() {
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        .book-cover-img:hover {
+          transform: scale(1.05) !important;
         }
       `}} />
     </main>

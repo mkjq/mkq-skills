@@ -6,18 +6,20 @@ import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
   const sql = `SELECT * FROM library_books WHERE id = ?`;
-  const books = await queryD1(sql, [params.id]);
+  const books = await queryD1(sql, [id]);
   const book = books[0];
   
   if (!book) return { title: 'كتاب غير موجود' };
   return { title: `${book.title} | المكتبة` };
 }
 
-export default async function BookReaderPage({ params }: { params: { id: string } }) {
+export default async function BookReaderPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const sql = `SELECT * FROM library_books WHERE id = ?`;
-  const books = await queryD1(sql, [params.id]);
+  const books = await queryD1(sql, [id]);
   const book = books[0];
 
   if (!book) {

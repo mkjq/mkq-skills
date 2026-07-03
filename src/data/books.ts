@@ -5,374 +5,413 @@ export interface Book {
   category: string;
   description: string;
   fileKey: string;
+  coverImage: string;
 }
 
 export const books: Book[] = [
-  // --- الفلسفة والفكر ---
   {
-    id: "muqaddimah",
-    title: "The Muqaddimah",
-    author: "Ibn Khaldun",
-    category: "Philosophy",
-    description: "A foundational work of historiography and sociology by the great Arab scholar Ibn Khaldun, analyzing the rise and fall of civilizations.",
-    fileKey: "books/the-muqaddimah-ibn-khaldun.pdf"
+    "id": "muqaddimah",
+    "title": "مقدمة ابن خلدون",
+    "author": "ابن خلدون",
+    "category": "Philosophy",
+    "description": "من أهم الكتب العربية في علم الاجتماع والتاريخ.",
+    "fileKey": "books/muqaddimah.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%85%D9%82%D8%AF%D9%85%D8%A9%20%D8%A7%D8%A8%D9%86%20%D8%AE%D9%84%D8%AF%D9%88%D9%86&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "the-prince",
-    title: "The Prince",
-    author: "Niccolò Machiavelli",
-    category: "Philosophy",
-    description: "The classic treatise on political power, statecraft, and leadership that remains influential in political philosophy to this day.",
-    fileKey: "books/the-prince-machiavelli.pdf"
+    "id": "the-prophet",
+    "title": "النبي",
+    "author": "جبران خليل جبران",
+    "category": "Philosophy",
+    "description": "كتاب فلسفي وروحي يتناول قضايا الحياة والموت والحب.",
+    "fileKey": "books/the-prophet.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%86%D8%A8%D9%8A&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "the-republic",
-    title: "The Republic",
-    author: "Plato",
-    category: "Philosophy",
-    description: "Plato's seminal dialogue on justice, the ideal state, and the nature of the philosopher-king.",
-    fileKey: "books/the-republic-plato.pdf"
+    "id": "taha-hussein-ayam",
+    "title": "الأيام",
+    "author": "طه حسين",
+    "category": "Philosophy",
+    "description": "سيرة ذاتية لعميد الأدب العربي طه حسين تعكس الحياة في مصر.",
+    "fileKey": "books/taha-hussein-ayam.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%A3%D9%8A%D8%A7%D9%85&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "the-art-of-war",
-    title: "The Art of War",
-    author: "Sun Tzu",
-    category: "Philosophy",
-    description: "The ancient Chinese military treatise on strategy, tactics, and the philosophy of warfare that transcends its military origins.",
-    fileKey: "books/the-art-of-war-sun-tzu.pdf"
+    "id": "al-islam-wa-osoloho",
+    "title": "الإسلام وأصول الحكم",
+    "author": "علي عبد الرازق",
+    "category": "Philosophy",
+    "description": "كتاب يناقش الخلافة والحكم في التاريخ الإسلامي.",
+    "fileKey": "books/al-islam-wa-osoloho.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%A5%D8%B3%D9%84%D8%A7%D9%85%20%D9%88%D8%A3%D8%B5%D9%88%D9%84%20%D8%A7%D9%84%D8%AD%D9%83%D9%85&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "meditations",
-    title: "Meditations",
-    author: "Marcus Aurelius",
-    category: "Philosophy",
-    description: "Personal reflections of the Roman Emperor on Stoic philosophy, virtue, resilience, and the art of living a meaningful life.",
-    fileKey: "books/meditations-marcus-aurelius.pdf"
+    "id": "hayy-ibn-yaqdhan",
+    "title": "حي بن يقظان",
+    "author": "ابن طفيل",
+    "category": "Philosophy",
+    "description": "قصة فلسفية تلخص الفكر الفلسفي الأندلسي.",
+    "fileKey": "books/hayy-ibn-yaqdhan.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AD%D9%8A%20%D8%A8%D9%86%20%D9%8A%D9%82%D8%B8%D8%A7%D9%86&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "beyond-good-and-evil",
-    title: "Beyond Good and Evil",
-    author: "Friedrich Nietzsche",
-    category: "Philosophy",
-    description: "Nietzsche's bold critique of traditional morality, exploring the concepts of the will to power and the übermensch.",
-    fileKey: "books/beyond-good-and-evil-nietzsche.pdf"
+    "id": "tahafut-al-falasifa",
+    "title": "تهافت الفلاسفة",
+    "author": "أبو حامد الغزالي",
+    "category": "Philosophy",
+    "description": "نقد عميق للفلسفة اليونانية والمنطق من منظور إسلامي.",
+    "fileKey": "books/tahafut-al-falasifa.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AA%D9%87%D8%A7%D9%81%D8%AA%20%D8%A7%D9%84%D9%81%D9%84%D8%A7%D8%B3%D9%81%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "critique-of-pure-reason",
-    title: "Critique of Pure Reason",
-    author: "Immanuel Kant",
-    category: "Philosophy",
-    description: "Kant's groundbreaking work that investigates the limits and possibilities of human knowledge and metaphysics.",
-    fileKey: "books/critique-of-pure-reason-kant.pdf"
+    "id": "al-munqidh",
+    "title": "المنقذ من الضلال",
+    "author": "أبو حامد الغزالي",
+    "category": "Philosophy",
+    "description": "سيرة ذاتية فكرية ورحلة نحو اليقين.",
+    "fileKey": "books/al-munqidh.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%85%D9%86%D9%82%D8%B0%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B6%D9%84%D8%A7%D9%84&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "ethics",
-    title: "Ethics",
-    author: "Baruch Spinoza",
-    category: "Philosophy",
-    description: "Spinoza's masterpiece, a systematic treatise on God, nature, the human mind, and the path to freedom through understanding.",
-    fileKey: "books/ethics-spinoza.pdf"
+    "id": "risalat-al-ghufran",
+    "title": "رسالة الغفران",
+    "author": "أبو العلاء المعري",
+    "category": "Philosophy",
+    "description": "رحلة خيالية فلسفية في الدار الآخرة.",
+    "fileKey": "books/risalat-al-ghufran.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%20%D8%A7%D9%84%D8%BA%D9%81%D8%B1%D8%A7%D9%86&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "leviathan",
-    title: "Leviathan",
-    author: "Thomas Hobbes",
-    category: "Philosophy",
-    description: "A foundational text in political philosophy arguing for a strong central authority to prevent the chaos of the state of nature.",
-    fileKey: "books/leviathan-thomas-hobbes.pdf"
+    "id": "al-bukhala",
+    "title": "البخلاء",
+    "author": "الجاحظ",
+    "category": "Philosophy",
+    "description": "تصوير دقيق وعميق لنفسية البخلاء والمجتمع.",
+    "fileKey": "books/al-bukhala.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%A8%D8%AE%D9%84%D8%A7%D8%A1&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "two-treatises",
-    title: "Two Treatises of Government",
-    author: "John Locke",
-    category: "Philosophy",
-    description: "Locke's influential defense of natural rights, individual liberty, and the social contract as the basis of legitimate government.",
-    fileKey: "books/two-treatises-of-government-john-locke.pdf"
+    "id": "al-bayan",
+    "title": "البيان والتبيين",
+    "author": "الجاحظ",
+    "category": "Philosophy",
+    "description": "من أمهات كتب الأدب العربي والفصاحة.",
+    "fileKey": "books/al-bayan.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%20%D9%88%D8%A7%D9%84%D8%AA%D8%A8%D9%8A%D9%8A%D9%86&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "social-contract",
-    title: "The Social Contract",
-    author: "Jean-Jacques Rousseau",
-    category: "Philosophy",
-    description: "Rousseau's exploration of the relationship between individual freedom and the authority of the state.",
-    fileKey: "books/the-social-contract-rousseau.pdf"
+    "id": "kalila-wa-dimna",
+    "title": "كليلة ودمنة",
+    "author": "ابن المقفع",
+    "category": "Literature",
+    "description": "حكايات رمزية على لسان الحيوانات تحمل حكماً سياسية وأخلاقية.",
+    "fileKey": "books/kalila-wa-dimna.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%83%D9%84%D9%8A%D9%84%D8%A9%20%D9%88%D8%AF%D9%85%D9%86%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "communist-manifesto",
-    title: "The Communist Manifesto",
-    author: "Karl Marx",
-    category: "Philosophy",
-    description: "The revolutionary political pamphlet that outlined the principles of communism and class struggle.",
-    fileKey: "books/the-communist-manifesto-marx.pdf"
+    "id": "alf-layla",
+    "title": "ألف ليلة وليلة",
+    "author": "مجهول",
+    "category": "Literature",
+    "description": "مجموعة من الحكايات والقصص الشعبية العربية والشرقية.",
+    "fileKey": "books/alf-layla.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A3%D9%84%D9%81%20%D9%84%D9%8A%D9%84%D8%A9%20%D9%88%D9%84%D9%8A%D9%84%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "on-liberty",
-    title: "On Liberty",
-    author: "John Stuart Mill",
-    category: "Philosophy",
-    description: "Mill's passionate defense of individual freedom against the tyranny of the majority and government overreach.",
-    fileKey: "books/on-liberty-john-stuart-mill.pdf"
+    "id": "al-mutanabbi",
+    "title": "ديوان المتنبي",
+    "author": "أبو الطيب المتنبي",
+    "category": "Literature",
+    "description": "أعظم دواوين الشعر العربي حكمة وبلاغة.",
+    "fileKey": "books/al-mutanabbi.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AF%D9%8A%D9%88%D8%A7%D9%86%20%D8%A7%D9%84%D9%85%D8%AA%D9%86%D8%A8%D9%8A&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "utilitarianism",
-    title: "Utilitarianism",
-    author: "John Stuart Mill",
-    category: "Philosophy",
-    description: "Mill's systematic defense of the greatest happiness principle as the foundation of moral reasoning.",
-    fileKey: "books/utilitarianism-john-stuart-mill.pdf"
+    "id": "al-muallaqat",
+    "title": "المعلقات السبع",
+    "author": "شعراء الجاهلية",
+    "category": "Literature",
+    "description": "أشهر القصائد في تاريخ الشعر العربي الجاهلي.",
+    "fileKey": "books/al-muallaqat.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%85%D8%B9%D9%84%D9%82%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B3%D8%A8%D8%B9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "tao-te-ching",
-    title: "Tao Te Ching",
-    author: "Laozi",
-    category: "Philosophy",
-    description: "The foundational text of Taoism, offering profound wisdom on the nature of existence, simplicity, and harmony with the Tao.",
-    fileKey: "books/tao-te-ching-laozi.pdf"
+    "id": "majnoon-layla",
+    "title": "مجنون ليلى",
+    "author": "قيس بن الملوح",
+    "category": "Literature",
+    "description": "أشهر قصص العذرية والحب في التراث العربي.",
+    "fileKey": "books/majnoon-layla.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%85%D8%AC%D9%86%D9%88%D9%86%20%D9%84%D9%8A%D9%84%D9%89&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "wealth-of-nations",
-    title: "The Wealth of Nations",
-    author: "Adam Smith",
-    category: "Philosophy",
-    description: "The foundational text of modern economics, analyzing free markets, the division of labor, and the invisible hand.",
-    fileKey: "books/the-wealth-of-nations-adam-smith.pdf"
-  },
-
-  // --- الأدب الكلاسيكي ---
-  {
-    id: "iliad",
-    title: "The Iliad",
-    author: "Homer",
-    category: "Literature",
-    description: "The epic poem of the Trojan War, exploring themes of heroism, honor, wrath, and the human condition.",
-    fileKey: "books/the-iliad-homer.pdf"
+    "id": "al-hamasa",
+    "title": "ديوان الحماسة",
+    "author": "أبو تمام",
+    "category": "Literature",
+    "description": "مختارات شعرية تمثل روح الفروسية والشجاعة.",
+    "fileKey": "books/al-hamasa.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AF%D9%8A%D9%88%D8%A7%D9%86%20%D8%A7%D9%84%D8%AD%D9%85%D8%A7%D8%B3%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "odyssey",
-    title: "The Odyssey",
-    author: "Homer",
-    category: "Literature",
-    description: "Homer's epic tale of Odysseus's perilous ten-year journey home after the fall of Troy.",
-    fileKey: "books/the-odyssey-homer.pdf"
+    "id": "luzumiyat",
+    "title": "اللزوميات",
+    "author": "أبو العلاء المعري",
+    "category": "Literature",
+    "description": "شعر فلسفي عميق يعكس نظرة المعري للحياة.",
+    "fileKey": "books/luzumiyat.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%84%D8%B2%D9%88%D9%85%D9%8A%D8%A7%D8%AA&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "aeneid",
-    title: "The Aeneid",
-    author: "Virgil",
-    category: "Literature",
-    description: "Virgil's Latin epic poem telling the legendary story of Aeneas, a Trojan who traveled to Italy and became an ancestor of the Romans.",
-    fileKey: "books/the-aeneid-virgil.pdf"
+    "id": "maqamat",
+    "title": "مقامات الحريري",
+    "author": "الحريري",
+    "category": "Literature",
+    "description": "قصص قصيرة مسجوعة تبرز براعة اللغة العربية.",
+    "fileKey": "books/maqamat.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%85%D9%82%D8%A7%D9%85%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AD%D8%B1%D9%8A%D8%B1%D9%8A&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "divine-comedy",
-    title: "The Divine Comedy",
-    author: "Dante Alighieri",
-    category: "Literature",
-    description: "Dante's monumental journey through Hell, Purgatory, and Paradise — one of the greatest works of world literature.",
-    fileKey: "books/the-divine-comedy-dante.pdf"
+    "id": "tarq-al-andalus",
+    "title": "طوق الحمامة",
+    "author": "ابن حزم الأندلسي",
+    "category": "Literature",
+    "description": "كتاب في الحب ومظاهره وأسبابه.",
+    "fileKey": "books/tarq-al-andalus.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B7%D9%88%D9%82%20%D8%A7%D9%84%D8%AD%D9%85%D8%A7%D9%85%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "paradise-lost",
-    title: "Paradise Lost",
-    author: "John Milton",
-    category: "Literature",
-    description: "Milton's epic poem on the fall of man, the rebellion of Satan, and the loss of the Garden of Eden.",
-    fileKey: "books/paradise-lost-john-milton.pdf"
+    "id": "akhbar-al-hamqa",
+    "title": "أخبار الحمقى والمغفلين",
+    "author": "ابن الجوزي",
+    "category": "Literature",
+    "description": "كتاب طريف يسرد قصص الحمقى للعبرة والابتسام.",
+    "fileKey": "books/akhbar-al-hamqa.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1%20%D8%A7%D9%84%D8%AD%D9%85%D9%82%D9%89%20%D9%88%D8%A7%D9%84%D9%85%D8%BA%D9%81%D9%84%D9%8A%D9%86&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "don-quixote",
-    title: "Don Quixote",
-    author: "Miguel de Cervantes",
-    category: "Literature",
-    description: "The comic masterpiece about a delusional knight-errant and his loyal squire, considered the first modern novel.",
-    fileKey: "books/don-quixote-cervantes.pdf"
+    "id": "awlad-haratina",
+    "title": "أولاد حارتنا",
+    "author": "نجيب محفوظ",
+    "category": "Novel",
+    "description": "رواية فلسفية عميقة وحائزة على جائزة نوبل.",
+    "fileKey": "books/awlad-haratina.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A3%D9%88%D9%84%D8%A7%D8%AF%20%D8%AD%D8%A7%D8%B1%D8%AA%D9%86%D8%A7&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "hamlet",
-    title: "Hamlet",
-    author: "William Shakespeare",
-    category: "Literature",
-    description: "Shakespeare's greatest tragedy of the Prince of Denmark, revenge, madness, and the human struggle with mortality.",
-    fileKey: "books/hamlet-shakespeare.pdf"
+    "id": "thulathiya",
+    "title": "الثلاثية",
+    "author": "نجيب محفوظ",
+    "category": "Novel",
+    "description": "أعظم عمل روائي عربي يرصد تحولات المجتمع المصري.",
+    "fileKey": "books/thulathiya.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%AB%D9%84%D8%A7%D8%AB%D9%8A%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "macbeth",
-    title: "Macbeth",
-    author: "William Shakespeare",
-    category: "Literature",
-    description: "A dark tragedy of ambition, guilt, and the destructive consequences of unchecked power.",
-    fileKey: "books/macbeth-shakespeare.pdf"
+    "id": "zaqaq-al-midaq",
+    "title": "زقاق المدق",
+    "author": "نجيب محفوظ",
+    "category": "Novel",
+    "description": "تصوير حي لحياة الحارة المصرية وتناقضاتها.",
+    "fileKey": "books/zaqaq-al-midaq.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B2%D9%82%D8%A7%D9%82%20%D8%A7%D9%84%D9%85%D8%AF%D9%82&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "othello",
-    title: "Othello",
-    author: "William Shakespeare",
-    category: "Literature",
-    description: "Shakespeare's powerful tragedy of jealousy, manipulation, and the destruction of love and trust.",
-    fileKey: "books/othello-shakespeare.pdf"
+    "id": "al-lis-wa-alkilab",
+    "title": "اللص والكلاب",
+    "author": "نجيب محفوظ",
+    "category": "Novel",
+    "description": "رواية سيكولوجية عن الخيانة والانتقام.",
+    "fileKey": "books/al-lis-wa-alkilab.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%84%D8%B5%20%D9%88%D8%A7%D9%84%D9%83%D9%84%D8%A7%D8%A8&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "king-lear",
-    title: "King Lear",
-    author: "William Shakespeare",
-    category: "Literature",
-    description: "A devastating tragedy of aging, family betrayal, madness, and the fragility of power.",
-    fileKey: "books/king-lear-shakespeare.pdf"
-  },
-
-  // --- الروايات الكلاسيكية ---
-  {
-    id: "pride-and-prejudice",
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    category: "Novel",
-    description: "Austen's brilliant romantic novel exploring themes of love, class, and the dangers of hasty judgment in Georgian England.",
-    fileKey: "books/pride-and-prejudice-jane-austen.pdf"
+    "id": "rijal-fil-shams",
+    "title": "رجال في الشمس",
+    "author": "غسان كنفاني",
+    "category": "Novel",
+    "description": "رواية مؤثرة عن مأساة اللجوء الفلسطيني.",
+    "fileKey": "books/rijal-fil-shams.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B1%D8%AC%D8%A7%D9%84%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%B4%D9%85%D8%B3&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "moby-dick",
-    title: "Moby Dick",
-    author: "Herman Melville",
-    category: "Novel",
-    description: "Captain Ahab's obsessive quest to hunt the great white whale — an allegory of man versus nature and obsession.",
-    fileKey: "books/moby-dick-herman-melville.pdf"
+    "id": "aid-ila-haifa",
+    "title": "عائد إلى حيفا",
+    "author": "غسان كنفاني",
+    "category": "Novel",
+    "description": "قصة عودة بعد سنوات وتساؤلات عن الوطن والأبوة.",
+    "fileKey": "books/aid-ila-haifa.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B9%D8%A7%D8%A6%D8%AF%20%D8%A5%D9%84%D9%89%20%D8%AD%D9%8A%D9%81%D8%A7&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "war-and-peace",
-    title: "War and Peace",
-    author: "Leo Tolstoy",
-    category: "Novel",
-    description: "Tolstoy's epic masterpiece depicting Russian society during the Napoleonic Wars, weaving history with deeply personal stories.",
-    fileKey: "books/war-and-peace-leo-tolstoy.pdf"
+    "id": "mawsim-alhijra",
+    "title": "موسم الهجرة إلى الشمال",
+    "author": "الطيب صالح",
+    "category": "Novel",
+    "description": "صراع الشرق والغرب في واحدة من أهم الروايات العربية.",
+    "fileKey": "books/mawsim-alhijra.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%85%D9%88%D8%B3%D9%85%20%D8%A7%D9%84%D9%87%D8%AC%D8%B1%D8%A9%20%D8%A5%D9%84%D9%89%20%D8%A7%D9%84%D8%B4%D9%85%D8%A7%D9%84&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "crime-and-punishment",
-    title: "Crime and Punishment",
-    author: "Fyodor Dostoevsky",
-    category: "Novel",
-    description: "A profound psychological novel exploring guilt, redemption, and the moral consequences of a young man's crime.",
-    fileKey: "books/crime-and-punishment-dostoevsky.pdf"
+    "id": "mudun-al-milh",
+    "title": "مدن الملح",
+    "author": "عبد الرحمن منيف",
+    "category": "Novel",
+    "description": "ملحمة روائية توثق التحولات في الخليج بعد اكتشاف النفط.",
+    "fileKey": "books/mudun-al-milh.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%85%D8%AF%D9%86%20%D8%A7%D9%84%D9%85%D9%84%D8%AD&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "brothers-karamazov",
-    title: "The Brothers Karamazov",
-    author: "Fyodor Dostoevsky",
-    category: "Novel",
-    description: "Dostoevsky's final and greatest novel — a philosophical drama of faith, doubt, morality, and family conflict.",
-    fileKey: "books/the-brothers-karamazov-dostoevsky.pdf"
+    "id": "azazeel",
+    "title": "عزازيل",
+    "author": "يوسف زيدان",
+    "category": "Novel",
+    "description": "رواية تاريخية لاهوتية تدور أحداثها في القرن الخامس الميلادي.",
+    "fileKey": "books/azazeel.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B9%D8%B2%D8%A7%D8%B2%D9%8A%D9%84&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "anna-karenina",
-    title: "Anna Karenina",
-    author: "Leo Tolstoy",
-    category: "Novel",
-    description: "Tolstoy's tragic novel of love, infidelity, and social conventions in Russian aristocratic society.",
-    fileKey: "books/anna-karenina-leo-tolstoy.pdf"
+    "id": "al-khubz-al-hafi",
+    "title": "الخبز الحافي",
+    "author": "محمد شكري",
+    "category": "Novel",
+    "description": "سيرة ذاتية روائية صريحة وجريئة.",
+    "fileKey": "books/al-khubz-al-hafi.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%AE%D8%A8%D8%B2%20%D8%A7%D9%84%D8%AD%D8%A7%D9%81%D9%8A&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "les-miserables",
-    title: "Les Misérables",
-    author: "Victor Hugo",
-    category: "Novel",
-    description: "Hugo's sweeping epic of justice, redemption, and revolution in 19th-century France, following the ex-convict Jean Valjean.",
-    fileKey: "books/les-miserables-victor-hugo.pdf"
+    "id": "thakirat-al-jasad",
+    "title": "ذاكرة الجسد",
+    "author": "أحلام مستغانمي",
+    "category": "Novel",
+    "description": "رواية شاعرية عن الثورة الجزائرية والحب والذاكرة.",
+    "fileKey": "books/thakirat-al-jasad.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B0%D8%A7%D9%83%D8%B1%D8%A9%20%D8%A7%D9%84%D8%AC%D8%B3%D8%AF&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "count-of-monte-cristo",
-    title: "The Count of Monte Cristo",
-    author: "Alexandre Dumas",
-    category: "Novel",
-    description: "The ultimate tale of betrayal, imprisonment, and an elaborate quest for revenge and justice.",
-    fileKey: "books/the-count-of-monte-cristo-dumas.pdf"
+    "id": "frankenstein-baghdad",
+    "title": "فرانكشتاين في بغداد",
+    "author": "أحمد سعداوي",
+    "category": "Novel",
+    "description": "رواية سريالية عن مآسي الحرب في العراق.",
+    "fileKey": "books/frankenstein-baghdad.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%81%D8%B1%D8%A7%D9%86%D9%83%D8%B4%D8%AA%D8%A7%D9%8A%D9%86%20%D9%81%D9%8A%20%D8%A8%D8%BA%D8%AF%D8%A7%D8%AF&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "frankenstein",
-    title: "Frankenstein",
-    author: "Mary Shelley",
-    category: "Novel",
-    description: "The groundbreaking Gothic novel about a scientist who creates life and faces the horrifying consequences of playing God.",
-    fileKey: "books/frankenstein-mary-shelley.pdf"
+    "id": "saq-al-bambou",
+    "title": "ساق البامبو",
+    "author": "سعود السنعوسي",
+    "category": "Novel",
+    "description": "بحث عن الهوية والانتماء بين الفلبين والكويت.",
+    "fileKey": "books/saq-al-bambou.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B3%D8%A7%D9%82%20%D8%A7%D9%84%D8%A8%D8%A7%D9%85%D8%A8%D9%88&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "dracula",
-    title: "Dracula",
-    author: "Bram Stoker",
-    category: "Novel",
-    description: "The definitive vampire novel, a masterpiece of Gothic horror that has shaped popular culture for over a century.",
-    fileKey: "books/dracula-bram-stoker.pdf"
+    "id": "al-abqaraiyat",
+    "title": "العبقريات",
+    "author": "عباس محمود العقاد",
+    "category": "Novel",
+    "description": "دراسات أدبية ونفسية لأبرز الشخصيات الإسلامية.",
+    "fileKey": "books/al-abqaraiyat.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%B9%D8%A8%D9%82%D8%B1%D9%8A%D8%A7%D8%AA&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "dorian-gray",
-    title: "The Picture of Dorian Gray",
-    author: "Oscar Wilde",
-    category: "Novel",
-    description: "Wilde's only novel — a dark tale of beauty, corruption, and the hidden costs of a life devoted to pleasure.",
-    fileKey: "books/the-picture-of-dorian-gray-oscar-wilde.pdf"
+    "id": "ana",
+    "title": "أنا",
+    "author": "عباس محمود العقاد",
+    "category": "Novel",
+    "description": "كتاب يتحدث فيه العقاد عن نفسه وتجاربه.",
+    "fileKey": "books/ana.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A3%D9%86%D8%A7&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "alice-in-wonderland",
-    title: "Alice's Adventures in Wonderland",
-    author: "Lewis Carroll",
-    category: "Novel",
-    description: "The beloved fantasy of a girl who falls through a rabbit hole into a world of whimsical nonsense and unforgettable characters.",
-    fileKey: "books/alice-in-wonderland-lewis-carroll.pdf"
+    "id": "bidaya-wa-nihaya",
+    "title": "البداية والنهاية",
+    "author": "ابن كثير",
+    "category": "History",
+    "description": "موسوعة تاريخية إسلامية ضخمة.",
+    "fileKey": "books/bidaya-wa-nihaya.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%A8%D8%AF%D8%A7%D9%8A%D8%A9%20%D9%88%D8%A7%D9%84%D9%86%D9%87%D8%A7%D9%8A%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "gullivers-travels",
-    title: "Gulliver's Travels",
-    author: "Jonathan Swift",
-    category: "Novel",
-    description: "Swift's brilliant satirical novel of a ship's surgeon who visits fantastical lands, critiquing human nature and society.",
-    fileKey: "books/gullivers-travels-jonathan-swift.pdf"
+    "id": "tarikh-al-khulafa",
+    "title": "تاريخ الخلفاء",
+    "author": "السيوطي",
+    "category": "History",
+    "description": "تأريخ موسع لحياة الخلفاء منذ عهد أبي بكر.",
+    "fileKey": "books/tarikh-al-khulafa.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE%20%D8%A7%D9%84%D8%AE%D9%84%D9%81%D8%A7%D8%A1&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "jane-eyre",
-    title: "Jane Eyre",
-    author: "Charlotte Brontë",
-    category: "Novel",
-    description: "A groundbreaking novel of an independent woman's moral and spiritual growth in the face of oppression.",
-    fileKey: "books/jane-eyre-charlotte-bronte.pdf"
+    "id": "al-kamil-fi-altarikh",
+    "title": "الكامل في التاريخ",
+    "author": "ابن الأثير",
+    "category": "History",
+    "description": "أحد أهم وأشمل المصادر في التاريخ الإسلامي.",
+    "fileKey": "books/al-kamil-fi-altarikh.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "wuthering-heights",
-    title: "Wuthering Heights",
-    author: "Emily Brontë",
-    category: "Novel",
-    description: "A wild, passionate tale of love and revenge set on the Yorkshire moors, one of English literature's most haunting works.",
-    fileKey: "books/wuthering-heights-emily-bronte.pdf"
+    "id": "tarikh-al-tabari",
+    "title": "تاريخ الطبري",
+    "author": "الطبري",
+    "category": "History",
+    "description": "من أقدم وأعظم كتب التأريخ المعتمدة.",
+    "fileKey": "books/tarikh-al-tabari.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE%20%D8%A7%D9%84%D8%B7%D8%A8%D8%B1%D9%8A&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "huckleberry-finn",
-    title: "The Adventures of Huckleberry Finn",
-    author: "Mark Twain",
-    category: "Novel",
-    description: "Twain's masterpiece following a young boy's journey down the Mississippi River — a profound commentary on race, freedom, and American society.",
-    fileKey: "books/the-adventures-of-huckleberry-finn-mark-twain.pdf"
+    "id": "shakhsiyat-misr",
+    "title": "شخصية مصر",
+    "author": "جمال حمدان",
+    "category": "History",
+    "description": "دراسة عبقرية في جغرافية وتاريخ وشخصية مصر.",
+    "fileKey": "books/shakhsiyat-misr.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%B4%D8%AE%D8%B5%D9%8A%D8%A9%20%D9%85%D8%B5%D8%B1&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "great-expectations",
-    title: "Great Expectations",
-    author: "Charles Dickens",
-    category: "Novel",
-    description: "Dickens's compelling story of an orphan's rise from poverty to gentleman, exploring ambition, loyalty, and self-discovery.",
-    fileKey: "books/great-expectations-charles-dickens.pdf"
+    "id": "fitnat-al-kubra",
+    "title": "الفتنة الكبرى",
+    "author": "طه حسين",
+    "category": "History",
+    "description": "تحليل تاريخي وأدبي عميق لأحداث الفتنة في صدر الإسلام.",
+    "fileKey": "books/fitnat-al-kubra.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%81%D8%AA%D9%86%D8%A9%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
   {
-    id: "tale-of-two-cities",
-    title: "A Tale of Two Cities",
-    author: "Charles Dickens",
-    category: "Novel",
-    description: "A gripping historical novel set during the French Revolution, exploring sacrifice, resurrection, and the best and worst of humanity.",
-    fileKey: "books/a-tale-of-two-cities-charles-dickens.pdf"
+    "id": "qisat-al-hadara",
+    "title": "قصة الحضارة (مترجم)",
+    "author": "ويل ديورانت",
+    "category": "History",
+    "description": "موسوعة ضخمة توثق تاريخ الحضارات البشرية.",
+    "fileKey": "books/qisat-al-hadara.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D9%82%D8%B5%D8%A9%20%D8%A7%D9%84%D8%AD%D8%B6%D8%A7%D8%B1%D8%A9%20(%D9%85%D8%AA%D8%B1%D8%AC%D9%85)&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
-
-  // --- التاريخ ---
   {
-    id: "peloponnesian-war",
-    title: "The History of the Peloponnesian War",
-    author: "Thucydides",
-    category: "History",
-    description: "The first great work of political history, documenting the devastating war between Athens and Sparta.",
-    fileKey: "books/the-history-of-the-peloponnesian-war-thucydides.pdf"
+    "id": "tarikh-al-andalus",
+    "title": "تاريخ الأندلس",
+    "author": "ابن عذاري",
+    "category": "History",
+    "description": "توثيق شامل لتاريخ الأندلس والمغرب.",
+    "fileKey": "books/tarikh-al-andalus.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE%20%D8%A7%D9%84%D8%A3%D9%86%D8%AF%D9%84%D8%B3&background=0D8ABC&color=fff&size=512&font-size=0.33"
   },
+  {
+    "id": "futuhat-makkiya",
+    "title": "الفتوحات المكية",
+    "author": "ابن عربي",
+    "category": "History",
+    "description": "موسوعة صوفية وروحية كبرى.",
+    "fileKey": "books/futuhat-makkiya.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D9%81%D8%AA%D9%88%D8%AD%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D9%83%D9%8A%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
+  },
+  {
+    "id": "al-khutat",
+    "title": "الخطط المقريزية",
+    "author": "المقريزي",
+    "category": "History",
+    "description": "توثيق دقيق لتاريخ وتخطيط مدينة القاهرة.",
+    "fileKey": "books/al-khutat.pdf",
+    "coverImage": "https://ui-avatars.com/api/?name=%D8%A7%D9%84%D8%AE%D8%B7%D8%B7%20%D8%A7%D9%84%D9%85%D9%82%D8%B1%D9%8A%D8%B2%D9%8A%D8%A9&background=0D8ABC&color=fff&size=512&font-size=0.33"
+  }
 ];

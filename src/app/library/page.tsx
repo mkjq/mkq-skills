@@ -166,27 +166,31 @@ export default function LibraryPage() {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
-                  {/* Book Cover Placeholder */}
+                  {/* Book Cover */}
                   <div style={{
-                    height: '140px',
-                    background: `linear-gradient(135deg, ${color}20, ${color}05)`,
+                    height: '240px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderBottom: '1px solid var(--border-subtle)',
                     position: 'relative',
                     overflow: 'hidden',
+                    backgroundColor: '#111',
                   }}>
-                    <div style={{
-                      position: 'absolute',
-                      width: '120px',
-                      height: '120px',
-                      borderRadius: '50%',
-                      border: `3px solid ${color}20`,
-                      top: '-30px',
-                      right: '-30px',
-                    }} />
-                    <BookOpen size={48} color={color} style={{ opacity: 0.6 }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={book.coverImage}
+                      alt={book.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        opacity: 0.9,
+                        transition: 'transform 0.3s',
+                      }}
+                      onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                      onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                    />
                   </div>
 
                   {/* Book Info */}

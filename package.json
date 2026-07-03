@@ -30,6 +30,7 @@
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "pdfkit": "^0.19.1",
     "typescript": "^5",
     "wrangler": "^4.105.0"
   }

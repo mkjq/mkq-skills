@@ -1,15 +1,24 @@
-'use client';
-
-import { useParams } from 'next/navigation';
-import { books } from '@/data/books';
+import { queryD1 } from '@/lib/cloudflare';
 import PdfReader from '@/components/PdfReader';
 import Link from 'next/link';
 import { ArrowRight, Download } from 'lucide-react';
+import { Metadata } from 'next';
 
-export default function BookReaderPage() {
-  const params = useParams();
-  const bookId = params.id as string;
-  const book = books.find((b) => b.id === bookId);
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const sql = `SELECT * FROM library_books WHERE id = ?`;
+  const books = await queryD1(sql, [params.id]);
+  const book = books[0];
+  
+  if (!book) return { title: 'كتاب غير موجود' };
+  return { title: `${book.title} | المكتبة` };
+}
+
+export default async function BookReaderPage({ params }: { params: { id: string } }) {
+  const sql = `SELECT * FROM library_books WHERE id = ?`;
+  const books = await queryD1(sql, [params.id]);
+  const book = books[0];
 
   if (!book) {
     return (

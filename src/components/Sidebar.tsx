@@ -42,6 +42,11 @@ export default function Sidebar() {
             <LayoutDashboard size={14} /> المكتبة السحابية
           </span>
         </Link>
+        <Link href="/dashboard/library" style={{ textDecoration: 'none' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', marginTop: '10px', marginBottom: '8px', paddingInlineStart: '8px', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+            <LayoutDashboard size={14} /> إدارة المكتبة
+          </span>
+        </Link>
         
         <Link href="/dashboard/editor" style={{ 
           textDecoration: 'none', 

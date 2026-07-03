@@ -1,66 +1,46 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getR2Client, getR2Bucket } from '@/lib/cloudflare';
+import { NextResponse } from 'next/server';
+import { queryD1, getR2Client, getR2Bucket } from '@/lib/cloudflare';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { books } from '@/data/books';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const bookId = searchParams.get('id');
-
-  if (!bookId) {
-    return NextResponse.json({ error: 'Missing book id' }, { status: 400 });
-  }
-
-  const book = books.find((b) => b.id === bookId);
-  if (!book) {
-    return NextResponse.json({ error: 'Book not found' }, { status: 404 });
-  }
-
+export async function GET(req: Request) {
   try {
-    const client = getR2Client();
-    const bucket = getR2Bucket();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Missing book ID' }, { status: 400 });
+    }
 
+    const sql = `SELECT title, fileKey FROM library_books WHERE id = ?`;
+    const books = await queryD1(sql, [id]);
+    const book = books[0];
+
+    if (!book || !book.fileKey) {
+      return NextResponse.json({ error: 'Book not found' }, { status: 404 });
+    }
+
+    const s3Client = getR2Client();
     const command = new GetObjectCommand({
-      Bucket: bucket,
+      Bucket: getR2Bucket(),
       Key: book.fileKey,
     });
 
-    const response = await client.send(command);
+    const response = await s3Client.send(command);
+    const stream = response.Body as any;
 
-    if (!response.Body) {
-      return NextResponse.json({ error: 'File not found in storage' }, { status: 404 });
-    }
+    const encodedFileName = encodeURIComponent(`${book.title}.pdf`);
 
-    // Convert the readable stream to a Uint8Array
-    const chunks: Uint8Array[] = [];
-    const reader = response.Body.transformToWebStream().getReader();
-    
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-    }
-
-    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-    const result = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const chunk of chunks) {
-      result.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    return new NextResponse(result, {
+    return new Response(stream, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(book.title)}.pdf"`,
-        'Content-Length': totalLength.toString(),
+        'Content-Disposition': `attachment; filename="${encodedFileName}"; filename*=UTF-8''${encodedFileName}`,
+        'Cache-Control': 'no-cache',
       },
     });
-  } catch (error: unknown) {
-    console.error('Download error:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: 'Failed to download book', details: message }, { status: 500 });
+  } catch (error: any) {
+    console.error('Error downloading PDF:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

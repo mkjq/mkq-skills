@@ -118,6 +118,20 @@ export async function initializeD1() {
   `;
   await queryD1(favoritesSql);
 
+  const libraryBooksSql = `
+    CREATE TABLE IF NOT EXISTS library_books (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      author TEXT,
+      category TEXT,
+      description TEXT,
+      fileKey TEXT NOT NULL,
+      coverImage TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  await queryD1(libraryBooksSql);
+
   // Insert default row if it doesn't exist
   const checkSql = `SELECT id FROM global_settings WHERE id = 'global'`;
   const result = await queryD1(checkSql);

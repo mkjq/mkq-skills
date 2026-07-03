@@ -1,4 +1,5 @@
 import Sidebar from '@/components/Sidebar';
+import { Toaster } from 'react-hot-toast';
 
 export default function DashboardLayout({
   children,
@@ -11,6 +12,7 @@ export default function DashboardLayout({
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {children}
       </div>
+      <Toaster position="bottom-left" />
     </div>
   );
 }

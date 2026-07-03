@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { books } from '@/data/books';
+import { queryD1 } from '@/lib/cloudflare';
 import { BookOpen, Download, ArrowRight, Library, Search } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -8,8 +8,7 @@ export const metadata: Metadata = {
   description: 'اكتشف واقرأ مجموعة منتقاة من أفضل الكتب في البرمجة والتصميم والتقنية والعلوم والتاريخ.',
 };
 
-// Get unique categories
-const categories = [...new Set(books.map((b) => b.category))];
+export const dynamic = 'force-dynamic';
 
 // Pick a color for each category
 const categoryColors: Record<string, string> = {
@@ -17,9 +16,29 @@ const categoryColors: Record<string, string> = {
   Literature: '#3b82f6',
   Novel: '#10b981',
   History: '#f59e0b',
+  Productivity: '#14b8a6',
+  'Personal Finance': '#84cc16',
+  Business: '#2563eb',
+  'Self Help': '#db2777',
+  'Critical Thinking': '#6366f1',
+  Relationship: '#e11d48',
+  'Human Behavior': '#f97316',
+  Discipline: '#dc2626',
+  Communication: '#0ea5e9'
 };
 
-export default function LibraryPage() {
+export default async function LibraryPage() {
+  let books = [];
+  try {
+    const sql = `SELECT * FROM library_books ORDER BY created_at DESC`;
+    books = await queryD1(sql);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+  }
+
+  // Get unique categories
+  const categories = [...new Set(books.map((b: any) => b.category))];
+
   return (
     <main style={{
       flex: 1,
@@ -100,8 +119,8 @@ export default function LibraryPage() {
       </div>
 
       {/* Books by Category */}
-      {categories.map((category) => {
-        const categoryBooks = books.filter((b) => b.category === category);
+      {categories.length > 0 ? categories.map((category: any) => {
+        const categoryBooks = books.filter((b: any) => b.category === category);
         const color = categoryColors[category] || 'var(--brand-primary)';
 
         return (
@@ -154,7 +173,7 @@ export default function LibraryPage() {
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
               gap: '20px',
             }}>
-              {categoryBooks.map((book) => (
+              {categoryBooks.map((book: any) => (
                 <div
                   key={book.id}
                   className="glass-panel"
@@ -275,7 +294,7 @@ export default function LibraryPage() {
             </div>
           </section>
         );
-      })}
+      }) : null}
 
       {/* Footer */}
       <footer style={{

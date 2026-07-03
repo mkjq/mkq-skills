@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Code2, Cloud } from 'lucide-react';
+import { ArrowLeft, Sparkles, Code2, Cloud, Library } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -75,9 +75,12 @@ export default function Home() {
               <ArrowLeft size={18} />
             </button>
           </Link>
-          <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
-             استكشف المميزات
-          </button>
+          <Link href="/library" style={{ textDecoration: 'none' }}>
+            <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
+              <Library size={18} />
+              المكتبة الرقمية
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -111,6 +114,13 @@ export default function Home() {
            </div>
            <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مزامنة سحابية لحظية</h3>
            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>احفظ ملفاتك محلياً أو سحابياً باستخدام Firebase مع أعلى معايير الأمان والخصوصية.</p>
+        </div>
+        <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+           <div style={{ padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '50%', marginBottom: '20px' }}>
+             <Library size={32} color="#f59e0b" />
+           </div>
+           <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مكتبة كتب رقمية</h3>
+           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>اقرأ وحمّل أكثر من 45 كتاباً عالمياً في البرمجة والتصميم والعلوم مباشرة من المتصفح.</p>
         </div>
       </div>
       

@@ -8,9 +8,10 @@ export default function Sidebar() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="glass-panel" style={{ 
+    <aside className="glass-panel" style={{ 
       width: '280px', 
-      height: '100%', 
+      height: '100vh', 
+      flexShrink: 0,
       borderRadius: '0',
       borderTop: 'none', borderBottom: 'none', borderRight: 'none',
       borderInlineEnd: '1px solid var(--border-subtle)',

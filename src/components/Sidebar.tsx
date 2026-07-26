@@ -11,6 +11,8 @@ export default function Sidebar() {
     <aside className="glass-panel" style={{ 
       width: '280px', 
       height: '100vh', 
+      position: 'sticky',
+      top: 0,
       flexShrink: 0,
       borderRadius: '0',
       borderTop: 'none', borderBottom: 'none', borderRight: 'none',

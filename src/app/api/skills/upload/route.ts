@@ -55,6 +55,7 @@ export async function POST(request: Request) {
 
     const s3 = getR2Client();
     const bucket = getR2Bucket();
+    const safeOriginalName = encodeURIComponent(file.name);
 
     await s3.send(
       new PutObjectCommand({
@@ -63,9 +64,9 @@ export async function POST(request: Request) {
         Body: text,
         ContentType: 'text/markdown; charset=utf-8',
         Metadata: {
-          originalName: file.name,
+          originalName: safeOriginalName,
           uploadedAt: new Date().toISOString(),
-          owner: user.username,
+          owner: username,
           folder,
         },
       })

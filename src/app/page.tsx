@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Code2, Cloud, Library } from 'lucide-react';
+import { ArrowLeft, Sparkles, Code2, Cloud, Lock } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -122,10 +122,10 @@ export default function Home() {
         </div>
         <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
            <div style={{ padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '50%', marginBottom: '20px' }}>
-             <Library size={32} color="#f59e0b" />
+             <Lock size={32} color="#f59e0b" />
            </div>
-           <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مكتبة كتب رقمية</h3>
-           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>اقرأ وحمّل أكثر من 45 كتاباً عالمياً في البرمجة والتصميم والعلوم مباشرة من المتصفح.</p>
+           <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مكتبة ملفات خاصة محمية</h3>
+           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>احفظ ملفاتك الشخصية (.pdf, .zip, .png) بكلمة سر 1010 وحماية من المحاولات غير المصرح بها.</p>
         </div>
       </div>
       

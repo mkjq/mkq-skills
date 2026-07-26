@@ -268,7 +268,7 @@ export default function LibraryPage() {
   };
 
   return (
-    <div style={{ flex: 1, padding: '32px', position: 'relative', zIndex: 10 }}>
+    <div style={{ flex: 1, padding: '32px 32px 100px 32px', position: 'relative', zIndex: 10 }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
         {/* Header */}

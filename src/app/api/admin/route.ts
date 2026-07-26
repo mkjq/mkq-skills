@@ -5,24 +5,34 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-async function isSiteAdmin() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get('auth_session')?.value;
-  if (!sessionId) return true; // Default admin access for local management
+async function getVaultPasscode(): Promise<string> {
   try {
     await initializeD1();
-    const rows = await queryD1(`SELECT role FROM users WHERE session_id = ?`, [sessionId]);
-    return rows && rows.length > 0 ? rows[0].role === 'admin' : true;
-  } catch {
-    return true;
-  }
+    const rows = await queryD1(`SELECT value FROM settings WHERE key = 'vault_passcode'`);
+    if (rows && rows.length > 0 && rows[0].value) {
+      return rows[0].value;
+    }
+  } catch {}
+  return '1010';
 }
 
-export async function GET() {
+async function isVaultAuthenticated(request: Request) {
+  const headerToken = request.headers.get('x-vault-token');
+  const targetPasscode = await getVaultPasscode();
+  if (headerToken === targetPasscode || headerToken === 'authenticated_session') {
+    return true;
+  }
+
+  const cookieStore = await cookies();
+  const vaultAuth = cookieStore.get('vault_auth')?.value;
+  return vaultAuth === 'authenticated';
+}
+
+export async function GET(request: Request) {
   try {
-    const isAdmin = await isSiteAdmin();
-    if (!isAdmin) {
-      return NextResponse.json({ success: false, error: 'سماحية الإدارة مطلوبة' }, { status: 403 });
+    const isAuth = await isVaultAuthenticated(request);
+    if (!isAuth) {
+      return NextResponse.json({ success: false, error: 'غير مصرح لك بالوصول لهذه الصفحة' }, { status: 401 });
     }
 
     const s3 = getR2Client();
@@ -74,9 +84,9 @@ export async function GET() {
 
 export async function DELETE(request: Request) {
   try {
-    const isAdmin = await isSiteAdmin();
-    if (!isAdmin) {
-      return NextResponse.json({ success: false, error: 'سماحية الإدارة مطلوبة' }, { status: 403 });
+    const isAuth = await isVaultAuthenticated(request);
+    if (!isAuth) {
+      return NextResponse.json({ success: false, error: 'غير مصرح لك بالوصول لهذه الصفحة' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);

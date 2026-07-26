@@ -174,8 +174,13 @@ export default function PrivateVaultPage() {
 
         const resText = await res.text();
         let data: any = {};
-        try { data = JSON.parse(resText); } catch {
-          throw new Error(`استجابة السيرفر غير صالحة أثناء رفع ${file.name}`);
+        try {
+          data = JSON.parse(resText);
+        } catch {
+          if (res.status === 413) {
+            throw new Error(`حجم الملف "${file.name}" كبير جداً للسحابة (أقصى حد 100MB).`);
+          }
+          throw new Error(`تعذر رفع الملف "${file.name}"، أعد المحاولة أو تأكد من إدخال كلمة السر 1010.`);
         }
 
         if (!res.ok || !data.success) {

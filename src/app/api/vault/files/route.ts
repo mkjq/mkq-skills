@@ -82,14 +82,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار أي ملف' }, { status: 400 });
     }
 
-    // Stream body to prevent Out-Of-Memory (OOM) RAM crashes on large files
-    let uploadBody: any;
-    try {
-      uploadBody = file.stream();
-    } catch {
-      const arrayBuffer = await file.arrayBuffer();
-      uploadBody = Buffer.from(arrayBuffer);
-    }
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     const key = `vault/private/${file.name}`;
     const s3 = getR2Client();
@@ -102,8 +96,7 @@ export async function POST(request: Request) {
       new PutObjectCommand({
         Bucket: bucket,
         Key: key,
-        Body: uploadBody,
-        ContentLength: file.size,
+        Body: buffer,
         ContentType: file.type || 'application/octet-stream',
         Metadata: {
           originalName: safeOriginalName,

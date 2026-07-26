@@ -180,7 +180,7 @@ export default function PrivateVaultPage() {
           if (res.status === 413) {
             throw new Error(`حجم الملف "${file.name}" كبير جداً للسحابة (أقصى حد 100MB).`);
           }
-          throw new Error(`تعذر رفع الملف "${file.name}"، أعد المحاولة أو تأكد من إدخال كلمة السر 1010.`);
+          throw new Error(`تعذر رفع الملف "${file.name}"، أعد المحاولة أو تأكد من إدخال كلمة السر.`);
         }
 
         if (!res.ok || !data.success) {
@@ -405,7 +405,7 @@ export default function PrivateVaultPage() {
             <div style={{ position: 'relative' }}>
               <input
                 type="password"
-                placeholder="أدخل كلمة السر (الافتراضية: 1010)"
+                placeholder="أدخل كلمة السر الخاصة..."
                 value={passcode}
                 onChange={e => setPasscode(e.target.value)}
                 style={{
@@ -605,7 +605,7 @@ export default function PrivateVaultPage() {
               <ShieldAlert size={24} color="#10b981" />
               <div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>الحماية والحالة</span>
-                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#10b981' }}>مكتملة ومحمية بـ 1010</span>
+                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#10b981' }}>مكتملة ومحمية بكلمة السر</span>
               </div>
             </div>
 

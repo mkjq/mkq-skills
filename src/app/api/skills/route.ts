@@ -72,27 +72,42 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    const { filename, content, folder, existingKey } = await request.json();
+    const targetFolder = folder || 'public';
+
+    if (!user && targetFolder === 'private') {
+      return NextResponse.json({ success: false, error: 'يجب تسجيل الدخول لحفظ الملفات الخاصة' }, { status: 401 });
     }
 
-    const { filename, content, folder, existingKey } = await request.json();
     if (!filename || content === undefined) {
       return NextResponse.json({ success: false, error: 'Filename and content are required' }, { status: 400 });
     }
 
     const s3 = getR2Client();
     const bucket = getR2Bucket();
-    const targetFolder = folder || 'private';
+    const username = user ? user.username : 'guest';
     
-    let key = `${targetFolder}/${user.username}/${filename}`;
+    let key = `${targetFolder}/${username}/${filename}`;
 
-    // If overwriting an existing file
+    // If overwriting or changing visibility of an existing file
     if (existingKey) {
       const parts = existingKey.split('/');
+      const oldFolder = parts[0];
       const owner = parts.length >= 3 ? parts[1] : '';
-      if (user.role === 'admin' || owner === user.username) {
-        key = existingKey;
+
+      const canModify = !user || user.role === 'admin' || owner === user.username || owner === 'guest';
+      if (canModify) {
+        // If folder changed (e.g. private -> public), delete old key and use new key
+        if (oldFolder !== targetFolder) {
+          try {
+            await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: existingKey }));
+          } catch (e) {
+            console.warn('Could not delete old key:', existingKey, e);
+          }
+          key = `${targetFolder}/${username}/${filename}`;
+        } else {
+          key = existingKey;
+        }
       }
     }
 

@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   try {
     const isAuth = await isVaultAuthenticated(request);
     if (!isAuth) {
-      return NextResponse.json({ success: false, error: 'جلسة المكتبة الخاصة غير مفعلة، يرجى إدخال كلمة السر 1010' }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'غير مصرح لك بالوصول. يرجى إدخال كلمة السر الخاصة.' }, { status: 401 });
     }
 
     const s3 = getR2Client();
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
   try {
     const isAuth = await isVaultAuthenticated(request);
     if (!isAuth) {
-      return NextResponse.json({ success: false, error: 'جلسة المكتبة الخاصة غير مفعلة، يرجى إدخال كلمة السر 1010' }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'غير مصرح لك بالوصول. يرجى إدخال كلمة السر الخاصة.' }, { status: 401 });
     }
 
     const formData = await request.formData();
@@ -116,7 +116,7 @@ export async function DELETE(request: Request) {
   try {
     const isAuth = await isVaultAuthenticated(request);
     if (!isAuth) {
-      return NextResponse.json({ success: false, error: 'جلسة المكتبة الخاصة غير مفعلة، يرجى إدخال كلمة السر 1010' }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'غير مصرح لك بالوصول. يرجى إدخال كلمة السر الخاصة.' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);

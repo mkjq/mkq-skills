@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { FileText, Settings, Plus, LayoutDashboard, Sun, Moon } from 'lucide-react';
+import { FileText, Settings, Plus, LayoutDashboard, Sun, Moon, Lock, Shield } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 export default function Sidebar() {
@@ -38,8 +38,20 @@ export default function Sidebar() {
         </Link>
 
         <Link href="/dashboard" style={{ textDecoration: 'none' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', marginTop: '10px', marginBottom: '8px', paddingInlineStart: '8px', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-            <LayoutDashboard size={14} /> المكتبة السحابية للمهارات
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '700', marginTop: '6px', marginBottom: '8px', paddingInlineStart: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <LayoutDashboard size={16} /> المكتبة السحابية العامة
+          </span>
+        </Link>
+
+        <Link href="/vault" style={{ textDecoration: 'none' }}>
+          <span style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: '700', marginTop: '6px', marginBottom: '8px', paddingInlineStart: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <Lock size={16} color="#f59e0b" /> المكتبة المحمية (1010) 🔒
+          </span>
+        </Link>
+
+        <Link href="/admin" style={{ textDecoration: 'none' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--brand-primary)', fontWeight: '700', marginTop: '6px', marginBottom: '12px', paddingInlineStart: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <Settings size={16} /> لوحة التحكم الشاملة ⚙️
           </span>
         </Link>
         

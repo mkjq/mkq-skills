@@ -46,7 +46,7 @@ export default function Sidebar() {
 
         <Link href="/vault" style={{ textDecoration: 'none' }}>
           <span style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: '700', marginTop: '6px', marginBottom: '8px', paddingInlineStart: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-            <Lock size={16} color="#f59e0b" /> المكتبة المحمية (1010) 🔒
+            <Lock size={16} color="#f59e0b" /> المكتبة الخاصة المحمية 🔒
           </span>
         </Link>
 

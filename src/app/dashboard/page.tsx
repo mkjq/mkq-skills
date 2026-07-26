@@ -142,10 +142,10 @@ export default function LibraryPage() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!user) { setShowAuthModal(true); return; }
+    const folder = activeTab === 'public' ? 'public' : 'private';
+    if (!user && folder === 'private') { setShowAuthModal(true); return; }
     const file = e.target.files?.[0];
     if (!file) return;
-    const folder = activeTab === 'public' ? 'public' : 'private';
     setUploading(true);
     setUploadMsg('جاري الرفع...');
     try {

@@ -433,7 +433,7 @@ export default function PrivateVaultPage() {
   // 2. Lockout View (5 wrong attempts)
   if (isLocked) {
     return (
-      <div style={{ display: 'flex', height: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', color: '#fff', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div className="glass-panel" style={{ maxWidth: '480px', width: '100%', padding: '40px', textAlign: 'center', borderRadius: '24px', border: '1px solid rgba(239, 68, 68, 0.3)', boxShadow: '0 20px 50px rgba(239, 68, 68, 0.2)' }}>
           <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', border: '2px solid #ef4444' }}>
             <span style={{ fontSize: '42px' }}>🐢</span>
@@ -443,12 +443,12 @@ export default function PrivateVaultPage() {
             على مهلك حبيبي جرب بعدين ✋🐢
           </h2>
 
-          <p style={{ color: '#cbd5e1', fontSize: '1rem', lineHeight: '1.6', marginBottom: '24px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.6', marginBottom: '24px' }}>
             لقد قمت بإدخال كلمة سر خاطئة 5 مرات متتالية. تم حظر المحاولات مؤقتاً لحماية مكتبتك الخاصة.
           </p>
 
-          <div style={{ background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
-            <span style={{ fontSize: '0.9rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>يرجى الانتظار حتى انتهاء العد التنازلي:</span>
+          <div style={{ background: 'var(--bg-surface)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-subtle)', marginBottom: '24px' }}>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>يرجى الانتظار حتى انتهاء العد التنازلي:</span>
             <span style={{ fontSize: '2rem', fontWeight: '900', color: '#fbbf24', letterSpacing: '2px' }}>
               {Math.floor(lockSeconds / 60)}:{(lockSeconds % 60).toString().padStart(2, '0')}
             </span>
@@ -467,7 +467,7 @@ export default function PrivateVaultPage() {
   // 3. Passcode Gate Modal (Unauthenticated)
   if (!authenticated) {
     return (
-      <div style={{ display: 'flex', height: '100vh', background: 'linear-gradient(135deg, #0b0f19 0%, #111827 100%)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div className="glass-panel" style={{ maxWidth: '420px', width: '100%', padding: '36px', borderRadius: '24px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
           <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--brand-primary), #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', boxShadow: '0 8px 20px var(--brand-glow)' }}>
             <Lock size={32} color="#fff" />
@@ -536,7 +536,7 @@ export default function PrivateVaultPage() {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflow: 'hidden', position: 'relative' }}
+      style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', overflow: 'hidden', position: 'relative' }}
     >
       {/* Drag and drop overlay target - pointerEvents: 'none' prevents flicker loop */}
       {isDragging && (

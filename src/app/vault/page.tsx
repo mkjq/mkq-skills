@@ -28,8 +28,9 @@ export default function PrivateVaultPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'doc' | 'image' | 'archive' | 'media'>('all');
 
-  // Drag and drop state
+  // Drag and drop state + counter to prevent flickering
   const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
 
   // Upload progress state
   const [uploading, setUploading] = useState(false);
@@ -153,7 +154,7 @@ export default function PrivateVaultPage() {
 
     setUploading(true);
     setUploadProgress(0);
-    setUploadMsg({ text: 'جاري بدء رفع الملفات...', type: 'info' });
+    setUploadMsg({ text: 'جاري بدء رفع الملفات والمجلدات...', type: 'info' });
 
     const totalFiles = fileList.length;
     let successCount = 0;
@@ -209,25 +210,101 @@ export default function PrivateVaultPage() {
     if (e.target.files) processFilesUpload(e.target.files);
   };
 
-  // Drag and Drop Event Handlers
+  // Helper to extract all files from dropped DataTransfer items (including recursive folder directories)
+  const getFilesFromDataTransfer = async (dataTransfer: DataTransfer): Promise<File[]> => {
+    const extractedFiles: File[] = [];
+    const items = dataTransfer.items;
+
+    if (!items || items.length === 0) {
+      return Array.from(dataTransfer.files || []);
+    }
+
+    const traverseEntry = async (entry: any, path = ''): Promise<void> => {
+      if (entry.isFile) {
+        return new Promise((resolve) => {
+          entry.file((file: File) => {
+            const relativeName = path ? `${path}/${file.name}` : file.name;
+            const renamedFile = new File([file], relativeName, {
+              type: file.type,
+              lastModified: file.lastModified
+            });
+            extractedFiles.push(renamedFile);
+            resolve();
+          });
+        });
+      } else if (entry.isDirectory) {
+        const dirReader = entry.createReader();
+        return new Promise((resolve) => {
+          const readNextBatch = () => {
+            dirReader.readEntries(async (entries: any[]) => {
+              if (!entries || entries.length === 0) {
+                resolve();
+              } else {
+                const subPromises = entries.map(e => traverseEntry(e, path ? `${path}/${entry.name}` : entry.name));
+                await Promise.all(subPromises);
+                readNextBatch();
+              }
+            });
+          };
+          readNextBatch();
+        });
+      }
+    };
+
+    const topPromises: Promise<void>[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === 'file') {
+        const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+        if (entry) {
+          topPromises.push(traverseEntry(entry));
+        } else {
+          const f = item.getAsFile();
+          if (f) extractedFiles.push(f);
+        }
+      }
+    }
+
+    await Promise.all(topPromises);
+    return extractedFiles.length > 0 ? extractedFiles : Array.from(dataTransfer.files || []);
+  };
+
+  // Smooth Flick-Free Drag and Drop Event Handlers using dragCounter ref
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isDragging) setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(false);
+    dragCounter.current--;
+    if (dragCounter.current <= 0) {
+      dragCounter.current = 0;
+      setIsDragging(false);
+    }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    dragCounter.current = 0;
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      processFilesUpload(e.dataTransfer.files);
+
+    if (e.dataTransfer) {
+      const droppedFiles = await getFilesFromDataTransfer(e.dataTransfer);
+      if (droppedFiles.length > 0) {
+        processFilesUpload(droppedFiles);
+      }
     }
   };
 
@@ -453,23 +530,25 @@ export default function PrivateVaultPage() {
   // 4. Authenticated Private Vault Dashboard View
   return (
     <div
+      onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflow: 'hidden', position: 'relative' }}
     >
-      {/* Drag and drop overlay target */}
+      {/* Drag and drop overlay target - pointerEvents: 'none' prevents flicker loop */}
       {isDragging && (
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(11, 15, 25, 0.85)',
+          background: 'rgba(11, 15, 25, 0.88)',
           backdropFilter: 'blur(12px)',
-          zIndex: 999,
+          zIndex: 9999,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '40px'
+          padding: '40px',
+          pointerEvents: 'none'
         }}>
           <div style={{
             width: '100%',
@@ -477,22 +556,23 @@ export default function PrivateVaultPage() {
             height: '400px',
             borderRadius: '24px',
             border: '3px dashed var(--brand-primary)',
-            background: 'rgba(59, 130, 246, 0.12)',
+            background: 'rgba(59, 130, 246, 0.14)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '20px',
-            boxShadow: '0 0 50px var(--brand-glow)'
+            boxShadow: '0 0 60px var(--brand-glow)',
+            pointerEvents: 'none'
           }}>
             <div style={{ padding: '24px', background: 'var(--brand-primary)', borderRadius: '50%', boxShadow: '0 8px 30px var(--brand-glow)' }}>
               <Upload size={48} color="#fff" />
             </div>
             <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff' }}>
-              أفلت الملفات هنا للرفع الفوري 📥
+              أفلت الملفات أو المجلدات هنا للرفع الفوري 📥
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-              يدعم المكتبة المحمية جميع صيغ الملفات والمجلدات
+              سيتم استخراج ورفع جميع ملفاتك ومجلداتك تلقائياً وبأقصى سرعة
             </p>
           </div>
         </div>
@@ -500,7 +580,7 @@ export default function PrivateVaultPage() {
 
       <Sidebar />
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
         {/* Header */}
         <header className="glass-panel" style={{ padding: '20px 32px', borderRadius: '0', borderInlineStart: 'none', borderInlineEnd: 'none', borderTop: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
           <div>

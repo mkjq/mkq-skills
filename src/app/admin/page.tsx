@@ -21,6 +21,10 @@ interface AdminStats {
 }
 
 export default function SiteAdminPage() {
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [adminPasscode, setAdminPasscode] = useState('');
+  const [adminAuthError, setAdminAuthError] = useState('');
+
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [files, setFiles] = useState<AdminFile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +37,15 @@ export default function SiteAdminPage() {
   const loadAdminData = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin');
+      const res = await fetch('/api/admin', {
+        headers: { 'x-vault-token': localStorage.getItem('mkq_vault_token') || '' }
+      });
+      if (res.status === 401) {
+        setAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+      setAuthenticated(true);
       const data = await res.json();
       if (data.success) {
         setStats(data.stats);
@@ -55,7 +67,10 @@ export default function SiteAdminPage() {
   const handleDeleteFile = async (key: string) => {
     if (!confirm(`هل أنت متأكد إدارياً من حذف الملف "${key}" نهائياً من النظام؟`)) return;
     try {
-      const res = await fetch(`/api/admin?key=${encodeURIComponent(key)}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin?key=${encodeURIComponent(key)}`, { 
+        method: 'DELETE',
+        headers: { 'x-vault-token': localStorage.getItem('mkq_vault_token') || '' }
+      });
       const data = await res.json();
       if (data.success) {
         setMsg(`✅ تم حذف الملف "${key}" بنجاح.`);
@@ -77,7 +92,10 @@ export default function SiteAdminPage() {
     try {
       const res = await fetch('/api/vault/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-vault-token': localStorage.getItem('mkq_vault_token') || ''
+        },
         body: JSON.stringify({ newPasscode: resetPasscode.trim() })
       });
       const data = await res.json();
@@ -104,6 +122,63 @@ export default function SiteAdminPage() {
   const filteredFiles = filterFolder === 'all'
     ? files
     : files.filter(f => f.folder === filterFolder);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminAuthError('');
+    try {
+      const res = await fetch('/api/vault/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passcode: adminPasscode })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('mkq_vault_token', adminPasscode);
+        setAuthenticated(true);
+        loadAdminData();
+      } else {
+        setAdminAuthError(data.error || 'رمز المرور غير صحيح');
+      }
+    } catch (err) {
+      setAdminAuthError('فشل الاتصال بالخادم');
+    }
+  };
+
+  if (authenticated === null) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', alignItems: 'center', justifyContent: 'center' }}>
+        <RefreshCw className="animate-spin" size={32} color="var(--brand-primary)" />
+      </div>
+    );
+  }
+
+  if (authenticated === false) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="glass-panel" style={{ padding: '40px', maxWidth: '400px', width: '90%', textAlign: 'center' }}>
+          <Lock size={48} color="var(--brand-primary)" style={{ margin: '0 auto 20px' }} />
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>لوحة الإدارة مقفلة</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>يرجى إدخال كلمة السر الخاصة للوصول</p>
+          
+          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <input
+              type="password"
+              placeholder="كلمة السر..."
+              value={adminPasscode}
+              onChange={e => setAdminPasscode(e.target.value)}
+              className="input-field"
+              autoFocus
+            />
+            {adminAuthError && <p style={{ color: '#ef4444', fontSize: '0.9rem' }}>{adminAuthError}</p>}
+            <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+              دخول
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflow: 'hidden' }}>

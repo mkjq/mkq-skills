@@ -537,7 +537,7 @@ export default function PrivateVaultPage() {
         </header>
 
         {/* Content Container */}
-        <div style={{ padding: '32px', flex: 1, maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
+        <div style={{ padding: '32px 32px 100px 32px', flex: 1, maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
 
           {/* Upload Progress Bar */}
           {uploading && (

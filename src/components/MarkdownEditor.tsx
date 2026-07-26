@@ -74,8 +74,8 @@ export default function MarkdownEditor() {
   }, [fileKey, user]);
 
   const handleSave = async () => {
-    if (!user) {
-      setSaveStatus('يجب تسجيل الدخول لحفظ الملفات.');
+    if (!user && visibility === 'private') {
+      setSaveStatus('يجب تسجيل الدخول لحفظ الملفات في مكتبتك الخاصة.');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -83,12 +83,10 @@ export default function MarkdownEditor() {
     setSaving(true);
     setSaveStatus('جاري الرفع للسحابة...');
     try {
-      // If fork mode: always save as a NEW file in user's own folder (no existingKey)
-      // If owner or admin editing own file: overwrite existingKey
       const parts = fileKey ? fileKey.split('/') : [];
       const fileOwner = parts.length >= 3 ? parts[1] : '';
       const isOwner = user && (user.role === 'admin' || fileOwner === user.username);
-      const useExistingKey = fileKey && isOwner && !isFork ? fileKey : undefined;
+      const useExistingKey = fileKey && (isOwner || !user) && !isFork ? fileKey : undefined;
 
       const response = await fetch('/api/skills', {
         method: 'POST',
@@ -102,8 +100,8 @@ export default function MarkdownEditor() {
       });
       const data = await response.json();
       if (data.success) {
-        setSaveStatus(isFork ? '✅ تم حفظ نسخة في مكتبتك!' : '✅ تم الحفظ في السحابة!');
-        setIsFork(false); // After fork save, it's now the user's own file
+        setSaveStatus(isFork ? '✅ تم حفظ نسخة في مكتبتك!' : '✅ تم الحفظ في السحابة العامة!');
+        setIsFork(false);
         setOriginalValue(value);
         setOriginalFilename(filename);
       } else {
@@ -122,102 +120,55 @@ export default function MarkdownEditor() {
     if (!value.trim()) return;
     
     setIsGenerating(true);
-    setValue('⏳ جاري التفكير وبناء المهارة...\n\n');
+    setValue('⏳ جاري التفكير وبناء المهارة الإجرائية للذكاء الاصطناعي...\n\n');
     
     // Detect if user wrote a description/request or an existing partial skill
-    const isExistingSkill = value.trim().startsWith('#');
+    const isExistingSkill = value.trim().startsWith('#') || value.trim().startsWith('---');
     
-    const RICH_MARKDOWN_RULES = `
-## 🎨 MANDATORY VISUAL FORMATTING RULES — FOLLOW STRICTLY
+    const SYSTEM_PROMPT_SKILL_RULES = `
+## 🎯 SYSTEM PROMPT & SKILL EXECUTION RULES — CRITICAL
 
-You MUST produce visually stunning, GitHub-quality Markdown. Plain text is UNACCEPTABLE. Every section must use rich visual elements:
+This file is an OPERATIONAL SKILL / SYSTEM PROMPT for AI models (Claude, GPT-4, DeepSeek, etc.).
+It MUST NOT be written as a GitHub repository README, project overview, installation guide, or marketing page with badges.
 
-### Required Visual Elements:
-1. **Emoji in every H1, H2, H3 heading** — choose contextually relevant emojis
-2. **Shields.io badges** in the header area for metadata (e.g. version, language, model compatibility):
-   \`![GPT-4](https://img.shields.io/badge/GPT--4-Compatible-brightgreen?style=flat-square)\`
-   \`![Claude](https://img.shields.io/badge/Claude-Compatible-blue?style=flat-square)\`
-   \`![DeepSeek](https://img.shields.io/badge/DeepSeek-Compatible-orange?style=flat-square)\`
-3. **Horizontal rules** (\`---\`) between major sections
-4. **Tables** for comparisons, examples, or structured data — use ✅ ❌ 🟡 in table cells
-5. **Code blocks** with language tags for any examples: \`\`\`markdown, \`\`\`json, \`\`\`text
-6. **Blockquotes** (\`> \`) for important notes, warnings, or tips
-7. **Bold + italic emphasis** — \`**bold**\`, \`*italic*\`, \`***bold italic***\` — use them liberally
-8. **Numbered + nested bullet lists** for all procedures and rules
-9. **Callout-style sections** using blockquote with emoji: \`> 💡 **Tip:** ...\` \`> ⚠️ **Warning:** ...\`
-10. **HTML-style centered banners** for the title area if needed
-
-### Example of how a GREAT header looks:
-\`\`\`markdown
-# 🧠 University Project Proofreading Expert
-
-> *A precision AI editor for academic documents — powered by scholarly rigor and linguistic mastery*
-
-![Version](https://img.shields.io/badge/Version-2.0-brightgreen?style=flat-square)
-![Arabic](https://img.shields.io/badge/Language-Arabic%20%2F%20English-blue?style=flat-square)
-![GPT-4](https://img.shields.io/badge/GPT--4-✓-green?style=flat-square)
-![Claude](https://img.shields.io/badge/Claude-✓-blue?style=flat-square)
-![DeepSeek](https://img.shields.io/badge/DeepSeek-✓-orange?style=flat-square)
-
+### Core Structure Required:
+1. **YAML Frontmatter** (name, description, when to trigger):
+\`\`\`yaml
+---
+name: skill-name
+description: Trigger when the user requests X. Provides step-by-step procedural execution guidance.
 ---
 \`\`\`
 
-### Example of a GREAT comparison table:
-| Feature | This AI | Standard Checker |
-|---------|---------|-----------------|
-| Grammar ✅ | Contextual | Surface-level |
-| Academic tone ✅ | Specialized | Generic |
-| Arabic support 🌍 | Native | Limited |
+2. **Role & Operational Purpose**: Clear definition of the AI persona and core task.
+3. **Trigger Scenarios & Prerequisites**: Specific context phrases and conditions when this skill applies.
+4. **Step-by-Step Execution Workflow**: Clear, imperative, numbered procedural steps for the AI agent to follow.
+5. **Strict Rules & Heuristics**: Bulleted rules with explicit MUST / MUST NOT constraints.
+6. **Input / Output Format Requirements**: Exact schemas, templates, or response structures expected from the AI.
+7. **Concrete Examples**: High-quality input/output pairs showing exact execution behavior.
+8. **Edge Case & Failure Handling**: Clear instructions on handling incomplete inputs or ambiguous requests.
 
-### Example of a GREAT example section:
-\`\`\`text
-📥 INPUT:
-"ان الطلاب يجب عليهم المذاكرة بشكل يومي"
-
-📤 OUTPUT:
-✅ Corrected: "يجب على الطلاب المذاكرة يومياً"
-📝 Changes: Restructured sentence, removed redundancy, improved formality
-\`\`\`
-
-DO NOT PRODUCE plain text paragraphs without visual structure. EVERY section needs visual richness.
+DO NOT INCLUDE GitHub badges, repository structure diagrams, installation steps (git clone, npm install), or project marketing README intro text.
 `;
 
     const aiPrompt = isExistingSkill
-      ? `You are given an existing AI Skill file. Your task is to TRANSFORM it into a visually stunning, world-class, production-ready Skill file.
+      ? `You are given an existing AI Skill file. Refine and transform it into a world-class, operational AI System Prompt skill file.
 
 EXISTING SKILL:
 \`\`\`markdown
 ${value}
 \`\`\`
 
-${RICH_MARKDOWN_RULES}
+${SYSTEM_PROMPT_SKILL_RULES}
 
-## YOUR TASK:
-1. Keep the original intent and purpose
-2. Rewrite ALL sections with crystal-clear precision
-3. Add ALL missing sections: Role & Identity, Core Responsibilities, Behavioral Guidelines, Constraints, Input Format, Output Format, Tone & Style, Examples, Edge Cases
-4. Add emoji to every heading
-5. Add shields.io compatibility badges after the title
-6. Add tables wherever comparisons or structured data appear
-7. Add code blocks for all examples (use proper language tags)
-8. Add blockquote callouts for tips and warnings
-9. Strengthen constraints — make them explicit and numbered
-10. Add at least 3 realistic input/output examples in formatted code blocks
-
-OUTPUT: Return ONLY the complete transformed Markdown. Start directly with # emoji heading. No preamble.`
-      : `You are given a user request for a new AI Skill. Generate a VISUALLY STUNNING, world-class, production-ready AI Skill file in Markdown format.
+OUTPUT: Return ONLY the complete operational Markdown Skill file starting with YAML frontmatter. No preamble or chat.`
+      : `Generate a production-ready operational AI System Prompt skill file based on this request:
 
 USER REQUEST: "${value}"
 
-${RICH_MARKDOWN_RULES}
+${SYSTEM_PROMPT_SKILL_RULES}
 
-## REQUIRED SECTIONS IN ORDER:
-1. \`# 🎯 [Skill Name]\` — with emoji, then tagline in italic blockquote
-2. Shields.io badges (version, language, model compatibility)
-3. \`---\`
-4. \`## 📋 Overview\` — 2-3 sentences, then a quick-reference table
-5. \`## 🎭 Role & Identity\` — vivid persona description
-6. \`## ✅ Core Responsibilities\` — numbered list with sub-bullets
+OUTPUT: Return ONLY the complete operational Markdown Skill file starting with YAML frontmatter. No preamble or chat.`;
 7. \`## 🧭 Behavioral Guidelines\` — numbered rules with examples
 8. \`## 🚫 Constraints\` — table with DO / DON'T columns
 9. \`## 📥 Input Format\` — structured with code block example
@@ -227,7 +178,7 @@ ${RICH_MARKDOWN_RULES}
 13. \`## ⚡ Edge Cases\` — table with Scenario / How to Handle columns
 14. \`---\` + footer badge line
 
-OUTPUT: Return ONLY the complete Markdown file. Start with # emoji heading. No preamble, no explanation.`;
+OUTPUT: Return ONLY the complete operational Markdown Skill file starting with YAML frontmatter. No preamble or chat.`;
 
     try {
       const response = await fetch('/api/ai', {

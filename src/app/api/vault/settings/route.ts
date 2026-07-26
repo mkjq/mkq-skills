@@ -18,8 +18,8 @@ export async function POST(request: Request) {
     }
 
     const { newPasscode } = await request.json();
-    if (!newPasscode || newPasscode.trim().length < 4) {
-      return NextResponse.json({ success: false, error: 'كلمة السر الجديدة يجب أن تكون مكونة من 4 أرقام أو رموز على الأقل' }, { status: 400 });
+    if (!newPasscode || typeof newPasscode !== 'string' || newPasscode.trim().length < 4 || newPasscode.length > 64) {
+      return NextResponse.json({ success: false, error: 'كلمة السر الجديدة يجب أن تكون مكونة من 4 أرقام أو رموز على الأقل وبحد أقصى 64 حرفاً' }, { status: 400 });
     }
 
     await initializeD1();

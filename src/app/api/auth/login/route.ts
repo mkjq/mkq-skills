@@ -10,8 +10,8 @@ export async function POST(req: Request) {
     
     const { username, password } = await req.json();
 
-    if (!username || !password) {
-      return NextResponse.json({ success: false, error: 'اسم المستخدم وكلمة المرور مطلوبان' }, { status: 400 });
+    if (!username || !password || typeof username !== 'string' || typeof password !== 'string' || username.length > 64 || password.length > 128) {
+      return NextResponse.json({ success: false, error: 'اسم المستخدم وكلمة المرور مطلوبان بالشكل الصحيح' }, { status: 400 });
     }
 
     const sql = `SELECT * FROM users WHERE username = ? AND password = ?`;

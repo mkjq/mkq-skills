@@ -1,14 +1,33 @@
 import { NextResponse } from 'next/server';
 import { queryD1 } from '@/lib/cloudflare';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
+async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get('auth_session')?.value;
+  if (!sessionId) return null;
+  const sql = `SELECT username, role FROM users WHERE session_id = ?`;
+  const users = await queryD1(sql, [sessionId]);
+  return users[0] || null;
+}
+
 export async function POST(req: Request) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'غير مصرح: يجب تسجيل الدخول لاستخدام الذكاء الاصطناعي' }, { status: 401 });
+    }
+
     const { prompt } = await req.json();
 
-    if (!prompt || !prompt.trim()) {
-      return NextResponse.json({ error: 'المحتوى فارغ' }, { status: 400 });
+    if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+      return NextResponse.json({ error: 'المحتوى فارغ أو غير صالح' }, { status: 400 });
+    }
+
+    if (prompt.length > 10000) {
+      return NextResponse.json({ error: 'حجم الطلب يتجاوز الحد الأقصى (10,000 حرف)' }, { status: 400 });
     }
 
     // Fetch settings from D1

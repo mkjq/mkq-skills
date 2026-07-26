@@ -222,7 +222,7 @@ Your mission: make every AI Skill on this platform 10x more powerful than what t
 
     const insertSql = `
       INSERT INTO global_settings (id, adminPassword, standardApiKey, openRouterApiKey, aiSystemPrompt)
-      VALUES ('global', '1010', '', '', ?)
+      VALUES ('global', '', '', '', ?)
     `;
     await queryD1(insertSql, [defaultPrompt]);
   }
@@ -233,7 +233,7 @@ Your mission: make every AI Skill on this platform 10x more powerful than what t
   if (adminResult.length === 0) {
     const insertAdminSql = `
       INSERT INTO users (id, username, password, role)
-      VALUES (?, 'M', '1010', 'admin')
+      VALUES (?, 'M', '', 'admin')
     `;
     await queryD1(insertAdminSql, [crypto.randomUUID()]);
   }

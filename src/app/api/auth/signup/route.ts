@@ -10,16 +10,20 @@ export async function POST(req: Request) {
     
     const { username, password } = await req.json();
 
-    if (!username || !password) {
-      return NextResponse.json({ success: false, error: 'اسم المستخدم وكلمة المرور مطلوبان' }, { status: 400 });
+    if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
+      return NextResponse.json({ success: false, error: 'اسم المستخدم وكلمة المرور مطلوبان بالشكل الصحيح' }, { status: 400 });
     }
 
-    if (username.length < 3) {
-      return NextResponse.json({ success: false, error: 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل' }, { status: 400 });
+    if (username.length < 3 || username.length > 32) {
+      return NextResponse.json({ success: false, error: 'اسم المستخدم يجب أن يكون بين 3 و 32 حرفاً' }, { status: 400 });
     }
 
-    if (password.length < 4) {
-      return NextResponse.json({ success: false, error: 'كلمة المرور يجب أن تكون 4 أحرف على الأقل' }, { status: 400 });
+    if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
+      return NextResponse.json({ success: false, error: 'اسم المستخدم يمكن أن يحتوي فقط على أحرف وأرقام و _ . -' }, { status: 400 });
+    }
+
+    if (password.length < 4 || password.length > 128) {
+      return NextResponse.json({ success: false, error: 'كلمة المرور يجب أن تكون بين 4 و 128 حرفاً' }, { status: 400 });
     }
 
     // Block reserved usernames

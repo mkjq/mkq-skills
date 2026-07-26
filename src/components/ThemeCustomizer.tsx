@@ -6,7 +6,7 @@ import { useTheme } from './ThemeProvider';
 
 export default function ThemeCustomizer() {
   const [isOpen, setIsOpen] = useState(false);
-  const { theme, direction, themeColor, shape, size, toggleTheme, setDirection, setThemeColor, setShape, setSize } = useTheme();
+  const { theme, direction, themeColor, shape, size, setTheme, setDirection, setThemeColor, setShape, setSize } = useTheme();
 
   return (
     <>
@@ -16,7 +16,7 @@ export default function ThemeCustomizer() {
         style={{ 
           position: 'fixed', 
           bottom: '24px', 
-          left: '24px',
+          insetInlineStart: '24px',
           width: '42px', 
           height: '42px', 
           borderRadius: '50%', 
@@ -43,11 +43,11 @@ export default function ThemeCustomizer() {
       <div style={{ 
         position: 'fixed', 
         top: 0, 
-        left: isOpen ? 0 : '-350px', 
+        insetInlineStart: isOpen ? 0 : '-350px', 
         width: '320px', 
         height: '100vh', 
         backgroundColor: 'var(--bg-surface-solid)',
-        borderRight: '1px solid var(--border-subtle)',
+        borderInlineEnd: '1px solid var(--border-subtle)',
         boxShadow: isOpen ? '10px 0 30px rgba(0,0,0,0.5)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         zIndex: 9999,
@@ -66,16 +66,16 @@ export default function ThemeCustomizer() {
 
         {/* 1. Mode */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الوضع (Mode)</label>
+          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الوضع</label>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={toggleTheme} className={theme === 'dark' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>داكن</button>
-            <button onClick={toggleTheme} className={theme === 'light' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>فاتح</button>
+            <button onClick={() => setTheme('dark')} className={theme === 'dark' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>داكن 🌙</button>
+            <button onClick={() => setTheme('light')} className={theme === 'light' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>فاتح ☀️</button>
           </div>
         </div>
 
         {/* 2. Direction */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الاتجاه (Direction)</label>
+          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الاتجاه</label>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setDirection('rtl')} className={direction === 'rtl' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>RTL (عربي)</button>
             <button onClick={() => setDirection('ltr')} className={direction === 'ltr' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>LTR (English)</button>
@@ -84,7 +84,7 @@ export default function ThemeCustomizer() {
 
         {/* 3. Colors */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الألوان (Colors)</label>
+          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الألوان</label>
           <div style={{ display: 'flex', gap: '12px' }}>
             {(['emerald', 'blue', 'purple', 'rose'] as const).map(c => (
               <button 
@@ -105,7 +105,7 @@ export default function ThemeCustomizer() {
 
         {/* 4. Shapes */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الأشكال (Shapes)</label>
+          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الأشكال</label>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setShape('sharp')} className={shape === 'sharp' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem', borderRadius: '0px' }}>حادة</button>
             <button onClick={() => setShape('rounded')} className={shape === 'rounded' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem', borderRadius: '8px' }}>ناعمة</button>
@@ -115,7 +115,7 @@ export default function ThemeCustomizer() {
 
         {/* 5. Size */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الحجم (Size)</label>
+          <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>الحجم</label>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setSize('small')} className={size === 'small' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>صغير</button>
             <button onClick={() => setSize('medium')} className={size === 'medium' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, padding: '8px', fontSize: '0.85rem' }}>متوسط</button>
@@ -128,7 +128,7 @@ export default function ThemeCustomizer() {
       {isOpen && (
         <div 
           onClick={() => setIsOpen(false)} 
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', zIndex: 9998 }}
+          style={{ position: 'fixed', top: 0, insetInlineStart: 0, width: '100%', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', zIndex: 9998 }}
         />
       )}
     </>

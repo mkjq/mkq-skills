@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // In-memory fallback attempt tracker for IP/Sessions
 const failedAttemptsMap = new Map<string, { count: number; lockedUntil: number }>();
 
-async function getVaultPasscode(): Promise<string> {
+async function getVaultPasscode(): Promise<string | null> {
   try {
     await initializeD1();
     const rows = await queryD1(`SELECT value FROM settings WHERE key = 'vault_passcode'`);
@@ -15,7 +15,7 @@ async function getVaultPasscode(): Promise<string> {
       return rows[0].value;
     }
   } catch {}
-  return '1010'; // Default passcode
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -40,9 +40,13 @@ export async function POST(request: Request) {
     }
 
     const { passcode } = await request.json();
+    if (!passcode || typeof passcode !== 'string' || passcode.length > 64) {
+      return NextResponse.json({ success: false, error: 'كلمة السر غير صحيحة' }, { status: 400 });
+    }
+
     const targetPasscode = await getVaultPasscode();
 
-    if (passcode === targetPasscode) {
+    if (targetPasscode && passcode === targetPasscode) {
       // Reset attempts on success
       failedAttemptsMap.delete(trackerKey);
       

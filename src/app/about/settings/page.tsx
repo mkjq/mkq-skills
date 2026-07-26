@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Lock, Save, Key, Bot, ShieldAlert } from 'lucide-react';
+import { Lock, Save, Key, Bot, ShieldAlert, RefreshCw, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
@@ -12,10 +12,10 @@ export default function SettingsPage() {
   const [message, setMessage] = useState('');
   
   const [settings, setSettings] = useState({
-    adminPassword: '1010',
+    adminPassword: '',
     standardApiKey: '',
     openRouterApiKey: '',
-    aiSystemPrompt: 'أنت مساعد ذكي ومبدع يقدم إجابات دقيقة واحترافية.'
+    aiSystemPrompt: 'أنت مساعد ذكي ومبدع يقدم إجابات دقيقة وااحترافية.'
   });
 
   const loadSettings = async () => {
@@ -67,15 +67,18 @@ export default function SettingsPage() {
 
   if (authLoading || (loading && user?.role === 'admin')) {
     return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>جاري التحقق من الصلاحيات...</span>
+      <div style={{ display: 'flex', minHeight: '100vh', width: '100%', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', color: 'var(--text-main)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <RefreshCw className="animate-spin" size={32} color="var(--brand-primary)" style={{ margin: '0 auto 16px auto' }} />
+          <p style={{ color: 'var(--text-muted)', fontWeight: 'bold' }}>جاري التحقق من الصلاحيات...</p>
+        </div>
       </div>
     );
   }
 
   if (!user || user.role !== 'admin') {
     return (
-      <div style={{ display: 'flex', height: 'calc(100vh - 80px)', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, var(--bg-surface), var(--bg-app))' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', width: '100%', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, var(--bg-surface), var(--bg-app))', color: 'var(--text-main)' }}>
         <div className="glass-panel" style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '350px', textAlign: 'center' }}>
           <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ShieldAlert size={32} color="#ef4444" />
@@ -91,16 +94,26 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', minHeight: 'calc(100vh - 80px)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '40px' }}>
-        <div style={{ width: '50px', height: '50px', borderRadius: '12px', background: 'var(--brand-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <ShieldAlert size={24} color="#fff" />
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', display: 'flex', flexDirection: 'column' }}>
+      <header className="glass-panel" style={{ padding: '16px 32px', borderRadius: '0', borderTop: 'none', borderInlineStart: 'none', borderInlineEnd: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+          <button className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.88rem' }}>
+            <ArrowRight size={16} className="rtl:rotate-180" /> العودة للمكتبة
+          </button>
+        </Link>
+        <span style={{ fontWeight: '700', fontSize: '1.1rem' }}>إعدادات النظام</span>
+      </header>
+
+      <div style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', width: '100%', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '40px' }}>
+          <div style={{ width: '50px', height: '50px', borderRadius: '12px', background: 'var(--brand-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShieldAlert size={24} color="#fff" />
+          </div>
+          <div>
+            <h1 style={{ margin: 0, color: 'var(--text-main)', fontSize: '2rem' }}>الإعدادات السحابية</h1>
+            <span style={{ color: 'var(--text-muted)' }}>التغييرات هنا تنعكس عالمياً لجميع المستخدمين</span>
+          </div>
         </div>
-        <div>
-          <h1 style={{ margin: 0, color: 'var(--text-main)', fontSize: '2rem' }}>الإعدادات السحابية</h1>
-          <span style={{ color: 'var(--text-muted)' }}>التغييرات هنا تنعكس عالمياً لجميع المستخدمين</span>
-        </div>
-      </div>
 
       <form onSubmit={handleSave} className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
         
@@ -180,6 +193,7 @@ export default function SettingsPage() {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

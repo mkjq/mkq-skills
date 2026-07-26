@@ -27,8 +27,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'يجب تسجيل الدخول لرفع الملفات الخاصة' }, { status: 401 });
     }
 
-    if (!file) {
+    if (!file || !(file instanceof File)) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار ملف' }, { status: 400 });
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ success: false, error: 'حجم الملف يتجاوز الحد الأقصى (10 ميجابايت)' }, { status: 400 });
     }
 
     const isAllowed =
@@ -45,17 +49,20 @@ export async function POST(request: Request) {
 
     const text = await file.text();
 
-    // Convert to .md filename regardless of input extension
-    const baseName = file.name.replace(/\.(txt|markdown)$/i, '');
-    const mdFilename = baseName.endsWith('.md') ? baseName : `${baseName}.md`;
+    // Convert to .md filename regardless of input extension and sanitize filename
+    const rawBaseName = file.name.replace(/\.(txt|markdown|md)$/i, '');
+    const cleanBaseName = rawBaseName.replace(/[^a-zA-Z0-9_.-]/g, '');
+    const safeBaseName = cleanBaseName.length > 120 ? cleanBaseName.substring(0, 120) : (cleanBaseName || 'skill');
+    const mdFilename = `${safeBaseName}.md`;
 
     // Store under folder/username/filename.md — guest for unauthenticated
+    const targetFolder = (typeof folder === 'string' && (folder === 'private' || folder === 'public')) ? folder : 'public';
     const username = user ? user.username : 'guest';
-    const key = `${folder}/${username}/${mdFilename}`;
+    const key = `${targetFolder}/${username}/${mdFilename}`;
 
     const s3 = getR2Client();
     const bucket = getR2Bucket();
-    const safeOriginalName = encodeURIComponent(file.name);
+    const safeOriginalName = encodeURIComponent(mdFilename);
 
     await s3.send(
       new PutObjectCommand({

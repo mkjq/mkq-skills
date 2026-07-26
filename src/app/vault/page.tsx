@@ -394,17 +394,17 @@ export default function PrivateVaultPage() {
   const getFileIcon = (ext: string) => {
     switch (ext) {
       case 'png': case 'jpg': case 'jpeg': case 'gif': case 'svg': case 'webp':
-        return <Image size={24} color="#ec4899" />;
+        return <Image size={24} color="var(--brand-primary)" />;
       case 'mp4': case 'mov': case 'avi': case 'mkv':
-        return <Film size={24} color="#8b5cf6" />;
+        return <Film size={24} color="var(--brand-primary)" />;
       case 'mp3': case 'wav': case 'aac':
-        return <Music size={24} color="#06b6d4" />;
+        return <Music size={24} color="var(--brand-primary)" />;
       case 'zip': case 'rar': case '7z': case 'tar': case 'gz':
-        return <FileArchive size={24} color="#f59e0b" />;
+        return <FileArchive size={24} color="var(--text-muted)" />;
       case 'pdf': case 'docx': case 'doc': case 'txt': case 'md':
-        return <FileText size={24} color="#10b981" />;
+        return <FileText size={24} color="var(--brand-primary)" />;
       default:
-        return <File size={24} color="#3b82f6" />;
+        return <File size={24} color="var(--text-muted)" />;
     }
   };
 
@@ -424,7 +424,7 @@ export default function PrivateVaultPage() {
   // 1. Loading State
   if (authenticated === null) {
     return (
-      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', width: '100%', background: 'var(--bg-main)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center' }}>
         <RefreshCw className="animate-spin" size={32} color="var(--brand-primary)" />
       </div>
     );
@@ -433,7 +433,7 @@ export default function PrivateVaultPage() {
   // 2. Lockout View (5 wrong attempts)
   if (isLocked) {
     return (
-      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', width: '100%', background: 'var(--bg-base)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div className="glass-panel" style={{ maxWidth: '480px', width: '100%', padding: '40px', textAlign: 'center', borderRadius: '24px', border: '1px solid rgba(239, 68, 68, 0.3)', boxShadow: '0 20px 50px rgba(239, 68, 68, 0.2)' }}>
           <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', border: '2px solid #ef4444' }}>
             <span style={{ fontSize: '42px' }}>🐢</span>
@@ -456,7 +456,7 @@ export default function PrivateVaultPage() {
 
           <Link href="/dashboard" style={{ textDecoration: 'none' }}>
             <button className="btn-secondary" style={{ width: '100%', padding: '12px', justifyContent: 'center' }}>
-              <ArrowRight size={18} /> العودة للمكتبة العامة
+              <ArrowRight size={18} className="rtl:rotate-180" /> العودة للمكتبة العامة
             </button>
           </Link>
         </div>
@@ -467,10 +467,10 @@ export default function PrivateVaultPage() {
   // 3. Passcode Gate Modal (Unauthenticated)
   if (!authenticated) {
     return (
-      <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', width: '100%', background: 'var(--bg-base)', color: 'var(--text-main)', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div className="glass-panel" style={{ maxWidth: '420px', width: '100%', padding: '36px', borderRadius: '24px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--brand-primary), #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', boxShadow: '0 8px 20px var(--brand-glow)' }}>
-            <Lock size={32} color="#fff" />
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', boxShadow: '0 8px 20px var(--brand-glow)' }}>
+            <Lock size={32} color="var(--bg-base)" />
           </div>
 
           <h2 style={{ fontSize: '1.6rem', fontWeight: '800', marginBottom: '8px' }}>
@@ -521,7 +521,7 @@ export default function PrivateVaultPage() {
 
           <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
             <Link href="/dashboard" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <ArrowRight size={14} /> العودة للمكتبة العامة
+              <ArrowRight size={14} className="rtl:rotate-180" /> العودة للمكتبة العامة
             </Link>
           </div>
         </div>
@@ -536,7 +536,7 @@ export default function PrivateVaultPage() {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-main)', overflow: 'hidden', position: 'relative' }}
+      style={{ display: 'flex', minHeight: '100vh', width: '100%', background: 'var(--bg-base)', color: 'var(--text-main)', position: 'relative' }}
     >
       {/* Drag and drop overlay target - pointerEvents: 'none' prevents flicker loop */}
       {isDragging && (
@@ -582,7 +582,7 @@ export default function PrivateVaultPage() {
 
       <Sidebar />
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
         {/* Header */}
         <header className="glass-panel" style={{ padding: '20px 32px', borderRadius: '0', borderInlineStart: 'none', borderInlineEnd: 'none', borderTop: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
           <div>
@@ -646,7 +646,7 @@ export default function PrivateVaultPage() {
                 <div style={{
                   width: `${uploadProgress}%`,
                   height: '100%',
-                  background: 'linear-gradient(90deg, #10b981, #3b82f6)',
+                  background: 'linear-gradient(90deg, var(--brand-primary), var(--brand-primary-hover))',
                   borderRadius: '100px',
                   transition: 'width 0.3s ease-in-out'
                 }} />
@@ -668,7 +668,7 @@ export default function PrivateVaultPage() {
               alignItems: 'center',
               gap: '10px'
             }}>
-              {uploadMsg.type === 'error' ? <AlertCircle size={20} color="#ef4444" /> : <CheckCircle2 size={20} color="#10b981" />}
+              {uploadMsg.type === 'error' ? <AlertCircle size={20} color="#ef4444" /> : <CheckCircle2 size={20} color="var(--brand-primary)" />}
               {uploadMsg.text}
             </div>
           )}
@@ -684,10 +684,10 @@ export default function PrivateVaultPage() {
             </div>
 
             <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <ShieldAlert size={24} color="#10b981" />
+              <ShieldAlert size={24} color="var(--brand-primary)" />
               <div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>الحماية والحالة</span>
-                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#10b981' }}>مكتملة ومحمية بكلمة السر</span>
+                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--brand-primary)' }}>مكتملة ومحمية بكلمة السر</span>
               </div>
             </div>
 
@@ -774,7 +774,7 @@ export default function PrivateVaultPage() {
                       {getFileIcon(file.extension)}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ fontWeight: '700', fontSize: '0.98rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={file.filename}>
+                      <h4 dir="auto" style={{ fontWeight: '700', fontSize: '0.98rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', unicodeBidi: 'isolate' }} title={file.filename}>
                         {file.filename}
                       </h4>
                       <div style={{ display: 'flex', gap: '10px', marginTop: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>

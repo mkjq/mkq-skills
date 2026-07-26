@@ -15,6 +15,7 @@ type ThemeContextType = {
   shape: ThemeShape;
   size: ThemeSize;
   toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
   setDirection: (dir: Direction) => void;
   setThemeColor: (color: ThemeColor) => void;
   setShape: (shape: ThemeShape) => void;
@@ -28,6 +29,7 @@ const ThemeContext = createContext<ThemeContextType>({
   shape: 'rounded',
   size: 'medium',
   toggleTheme: () => {},
+  setTheme: () => {},
   setDirection: () => {},
   setThemeColor: () => {},
   setShape: () => {},
@@ -35,7 +37,7 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setThemeState] = useState<Theme>('dark');
   const [direction, setDirection] = useState<Direction>('rtl');
   const [themeColor, setThemeColor] = useState<ThemeColor>('emerald');
   const [shape, setShape] = useState<ThemeShape>('rounded');
@@ -50,7 +52,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const ss = localStorage.getItem('app-shape') as ThemeShape || 'rounded';
     const ssz = localStorage.getItem('app-size') as ThemeSize || 'medium';
 
-    setTheme(st);
+    setThemeState(st);
     setDirection(sd);
     setThemeColor(sc);
     setShape(ss);
@@ -71,7 +73,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
-    updateState('app-theme', newTheme, setTheme, 'data-theme');
+    updateState('app-theme', newTheme, setThemeState, 'data-theme');
   };
 
   if (!mounted) {
@@ -81,7 +83,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeContext.Provider value={{ 
       theme, direction, themeColor, shape, size, 
-      toggleTheme, 
+      toggleTheme,
+      setTheme: (t) => updateState('app-theme', t, setThemeState, 'data-theme'),
       setDirection: (d) => updateState('app-dir', d, setDirection, 'dir'),
       setThemeColor: (c) => updateState('app-color', c, setThemeColor, 'data-color'),
       setShape: (s) => updateState('app-shape', s, setShape, 'data-shape'),

@@ -181,10 +181,10 @@ export default function SiteAdminPage() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       <Sidebar />
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
         {/* Header */}
         <header className="glass-panel" style={{ padding: '20px 32px', borderRadius: '0', borderInlineStart: 'none', borderInlineEnd: 'none', borderTop: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
           <div>
@@ -219,17 +219,17 @@ export default function SiteAdminPage() {
 
               <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>حجم التخزين الإجمالي</span>
-                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#10b981' }}>{formatSize(stats.totalSizeBytes)}</span>
+                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--brand-primary)' }}>{formatSize(stats.totalSizeBytes)}</span>
               </div>
 
               <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>المهارات العامة</span>
-                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#3b82f6' }}>{stats.publicSkillsCount}</span>
+                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--brand-primary)' }}>{stats.publicSkillsCount}</span>
               </div>
 
               <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>ملفات المكتبة المحمية</span>
-                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#f59e0b' }}>{stats.vaultFilesCount}</span>
+                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--text-muted)' }}>{stats.vaultFilesCount}</span>
               </div>
             </div>
           )}
@@ -254,7 +254,7 @@ export default function SiteAdminPage() {
             </form>
 
             {resetMsg && (
-              <p style={{ marginTop: '12px', fontSize: '0.88rem', color: resetMsg.includes('❌') ? '#ef4444' : '#10b981', fontWeight: '600' }}>
+              <p style={{ marginTop: '12px', fontSize: '0.88rem', color: resetMsg.includes('❌') ? '#ef4444' : 'var(--brand-primary)', fontWeight: '600' }}>
                 {resetMsg}
               </p>
             )}
@@ -301,11 +301,11 @@ export default function SiteAdminPage() {
                   <tbody>
                     {filteredFiles.map(f => (
                       <tr key={f.key} style={{ borderBottom: '1px solid var(--border-subtle)', fontSize: '0.9rem' }}>
-                        <td style={{ padding: '12px', fontWeight: '600', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={f.key}>
+                        <td dir="auto" style={{ padding: '12px', fontWeight: '600', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', unicodeBidi: 'isolate' }} title={f.key}>
                           {f.key}
                         </td>
                         <td style={{ padding: '12px' }}>
-                          <span style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', background: f.folder === 'public' ? 'rgba(59, 130, 246, 0.15)' : f.folder === 'vault' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)', color: f.folder === 'public' ? '#3b82f6' : f.folder === 'vault' ? '#f59e0b' : '#10b981', fontWeight: '700' }}>
+                          <span style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', background: 'var(--bg-surface-hover)', border: '1px solid var(--border-subtle)', color: 'var(--brand-primary)', fontWeight: '700' }}>
                             {f.folder}
                           </span>
                         </td>

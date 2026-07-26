@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-async function getVaultPasscode(): Promise<string> {
+async function getVaultPasscode(): Promise<string | null> {
   try {
     await initializeD1();
     const rows = await queryD1(`SELECT value FROM settings WHERE key = 'vault_passcode'`);
@@ -13,14 +13,14 @@ async function getVaultPasscode(): Promise<string> {
       return rows[0].value;
     }
   } catch {}
-  return '1010';
+  return null;
 }
 
 async function isVaultAuthenticated(request: Request) {
   // 1. Check header token
   const headerToken = request.headers.get('x-vault-token');
   const targetPasscode = await getVaultPasscode();
-  if (headerToken === targetPasscode || headerToken === 'authenticated_session') {
+  if (targetPasscode && headerToken && headerToken === targetPasscode) {
     return true;
   }
 
@@ -78,14 +78,20 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
-    if (!file) {
+    if (!file || !(file instanceof File)) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار أي ملف' }, { status: 400 });
     }
 
+    if (file.size > 50 * 1024 * 1024) {
+      return NextResponse.json({ success: false, error: 'حجم الملف يتجاوز الحد الأقصى (50 ميجابايت)' }, { status: 400 });
+    }
+
+    const cleanName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '');
+    const safeFilename = cleanName.length > 128 ? cleanName.substring(0, 128) : (cleanName || 'uploaded_file');
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const key = `vault/private/${file.name}`;
+    const key = `vault/private/${safeFilename}`;
     const s3 = getR2Client();
     const bucket = getR2Bucket();
 
@@ -106,7 +112,7 @@ export async function POST(request: Request) {
       })
     );
 
-    return NextResponse.json({ success: true, key, filename: file.name, size: file.size });
+    return NextResponse.json({ success: true, key, filename: safeFilename, size: file.size });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -121,8 +127,8 @@ export async function DELETE(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
-    if (!key) {
-      return NextResponse.json({ success: false, error: 'Key is required' }, { status: 400 });
+    if (!key || typeof key !== 'string' || key.length > 256 || key.includes('..') || !key.startsWith('vault/private/')) {
+      return NextResponse.json({ success: false, error: 'مفتاح الملف غير صالح' }, { status: 400 });
     }
 
     const s3 = getR2Client();

@@ -188,44 +188,44 @@ export default function LibraryPage() {
       <div
         className="magic-card"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+          background: 'var(--bg-surface)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: '18px',
           padding: '24px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
+          boxShadow: 'var(--shadow-premium)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
           overflow: 'hidden',
         }}
         onMouseEnter={e => {
           (e.currentTarget as HTMLElement).style.borderColor = 'var(--brand-primary)';
-          (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(0,0,0,0.4), 0 0 20px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.08)';
+          (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px var(--brand-glow)';
           (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
         }}
         onMouseLeave={e => {
-          (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)';
-          (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)';
+          (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-subtle)';
+          (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-premium)';
           (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
         }}
       >
         <div className="magic-card-inner" style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
           {/* Glow */}
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '80px', height: '80px', background: 'var(--brand-glow)', borderRadius: '50%', filter: 'blur(40px)', opacity: 0.5, pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 0, insetInlineEnd: 0, width: '80px', height: '80px', background: 'var(--brand-glow)', borderRadius: '50%', filter: 'blur(40px)', opacity: 0.5, pointerEvents: 'none' }} />
 
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', position: 'relative' }}>
-            <div style={{ width: '46px', height: '46px', borderRadius: '12px', flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-primary), #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px var(--brand-glow)' }}>
-              <FileText size={22} color="#fff" />
+            <div style={{ width: '46px', height: '46px', borderRadius: '12px', flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px var(--brand-glow)' }}>
+              <FileText size={22} style={{ color: 'var(--text-main)' }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontWeight: '700', fontSize: '1rem', marginBottom: '6px', wordBreak: 'break-word', color: 'var(--text-main)', lineHeight: '1.3' }}>{file.filename}</p>
+              <p dir="auto" style={{ fontWeight: '700', fontSize: '1rem', marginBottom: '6px', wordBreak: 'break-word', color: 'var(--text-main)', lineHeight: '1.3', unicodeBidi: 'isolate' }}>{file.filename}</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--bg-surface-hover)', padding: '2px 8px', borderRadius: '20px', border: '1px solid var(--border-subtle)' }}>
                   {formatSize(file.size)}
                 </span>
                 {file.lastModified && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(file.lastModified).toLocaleDateString('ar-SA')}</span>}
@@ -244,24 +244,24 @@ export default function LibraryPage() {
             </button>
           </div>
 
-          <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', marginTop: 'auto' }} />
+          <div style={{ height: '1px', background: 'var(--border-subtle)', marginTop: 'auto' }} />
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: '8px' }}>
             <Link href={`/dashboard/editor?key=${encodeURIComponent(file.key)}`} style={{ textDecoration: 'none', flex: 1 }}>
               <button className="btn-primary" style={{ width: '100%', padding: '9px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-              <Eye size={14} /> عرض وتعديل
+                <Eye size={14} /> عرض وتعديل
+              </button>
+            </Link>
+            <button className="btn-secondary" onClick={() => handleDownload(file.key, file.filename || 'file.md')} style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }} title="تحميل">
+              <Download size={14} />
             </button>
-          </Link>
-          <button className="btn-secondary" onClick={() => handleDownload(file.key, file.filename || 'file.md')} style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }} title="تحميل">
-            <Download size={14} />
-          </button>
-          {canDelete && (
-            <button className="btn-secondary" onClick={() => handleDelete(file.key, file.filename)} style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }} title="حذف">
-              <Trash2 size={14} />
-            </button>
-          )}
-        </div>
+            {canDelete && (
+              <button className="btn-secondary" onClick={() => handleDelete(file.key, file.filename)} style={{ padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }} title="حذف">
+                <Trash2 size={14} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -323,18 +323,19 @@ export default function LibraryPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px' }}>
               {popularFiles.map((pf, i) => (
                 <div key={pf.file_key} style={{
-                  background: 'linear-gradient(135deg, #155e75, #0e7490, #06b6d4)',
+                  background: 'var(--bg-surface)',
                   borderRadius: '16px',
+                  border: '1px solid var(--border-subtle)',
                   overflow: 'hidden',
                   position: 'relative',
-                  color: '#f0f9ff',
-                  boxShadow: '0 8px 32px rgba(6,182,212,0.25)',
+                  color: 'var(--text-main)',
+                  boxShadow: 'var(--shadow-premium)',
                 }}>
                   {/* Animated blob */}
                   <div style={{
                     position: 'absolute', width: '112px', height: '112px',
-                    borderRadius: '50%', border: '8px solid rgba(255,255,255,0.2)',
-                    top: '-48px', left: '-16px',
+                    borderRadius: '50%', border: '8px solid var(--border-strong)',
+                    top: '-48px', insetInlineStart: '-16px',
                     transition: 'all 0.7s ease',
                     pointerEvents: 'none',
                   }} />
@@ -342,30 +343,30 @@ export default function LibraryPage() {
                   {/* Content */}
                   <div style={{ padding: '20px 20px 0', position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                      <span style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '6px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: '700' }}>#{i + 1}</span>
-                      <Heart size={14} fill="#f0f9ff" color="#f0f9ff" />
+                      <span style={{ background: 'var(--bg-surface-hover)', borderRadius: '6px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: '700' }}>#{i + 1}</span>
+                      <Heart size={14} fill="var(--brand-primary)" color="var(--brand-primary)" />
                       <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>{pf.count} {pf.count === 1 ? 'إضافة' : 'إضافة'}</span>
                     </div>
-                    <p style={{ fontWeight: '700', fontSize: '1rem', lineHeight: '1.3', marginBottom: '8px', wordBreak: 'break-word' }}>{pf.filename}</p>
+                    <p dir="auto" style={{ fontWeight: '700', fontSize: '1rem', lineHeight: '1.3', marginBottom: '8px', wordBreak: 'break-word', unicodeBidi: 'isolate' }}>{pf.filename}</p>
                   </div>
 
                   {/* Action bar */}
-                  <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,0.15)', marginTop: '16px' }}>
+                  <div style={{ display: 'flex', borderTop: '1px solid var(--border-subtle)', marginTop: '16px' }}>
                     <Link href={`/dashboard/editor?key=${encodeURIComponent(pf.file_key)}`} style={{ textDecoration: 'none', flex: 1 }}>
-                      <button style={{ width: '100%', padding: '14px', background: 'rgba(240,249,255,0.1)', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', transition: 'background 0.2s' }}
-                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(240,249,255,0.2)'}
-                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(240,249,255,0.1)'}
+                      <button style={{ width: '100%', padding: '14px', background: 'var(--bg-surface-hover)', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', transition: 'background 0.2s' }}
+                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--border-subtle)'}
+                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--bg-surface-hover)'}
                       >
-                        <Eye size={20} color="#f0f9ff" />
+                        <Eye size={20} color="var(--text-main)" />
                       </button>
                     </Link>
                     <button
                       onClick={() => handleDownload(pf.file_key, pf.filename)}
-                      style={{ flex: 1, padding: '14px', background: 'rgba(240,249,255,0.1)', border: 'none', borderLeft: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer', display: 'flex', justifyContent: 'center', transition: 'background 0.2s' }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(240,249,255,0.2)'}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(240,249,255,0.1)'}
+                      style={{ flex: 1, padding: '14px', background: 'var(--bg-surface-hover)', border: 'none', borderInlineStart: '1px solid var(--border-subtle)', cursor: 'pointer', display: 'flex', justifyContent: 'center', transition: 'background 0.2s' }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--border-subtle)'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--bg-surface-hover)'}
                     >
-                      <Download size={20} color="#f0f9ff" />
+                      <Download size={20} color="var(--text-main)" />
                     </button>
                   </div>
                 </div>
@@ -410,7 +411,10 @@ export default function LibraryPage() {
               <div style={{ textAlign: 'center', padding: '60px', borderRadius: '16px', border: '2px dashed var(--border-strong)', color: 'var(--text-muted)' }}>
                 <Heart size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
                 <p style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '8px' }}>لا توجد مفضلات بعد</p>
-                <p style={{ fontSize: '0.9rem' }}>اضغط على أيقونة القلب ❤️ على أي ملف لإضافته للمفضلة</p>
+                <p style={{ fontSize: '0.9rem', marginBottom: '16px' }}>اضغط على أيقونة القلب ❤️ على أي ملف لإضافته للمفضلة</p>
+                <button className="btn-primary" onClick={() => setActiveTab('public')}>
+                  تصفح المكتبة العامة
+                </button>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>

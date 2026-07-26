@@ -73,24 +73,35 @@ export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
     const { filename, content, folder, existingKey } = await request.json();
-    const targetFolder = folder || 'public';
+
+    if (!filename || typeof filename !== 'string' || content === undefined || typeof content !== 'string') {
+      return NextResponse.json({ success: false, error: 'اسم الملف والمحتوى مطلوبان بالشكل الصحيح' }, { status: 400 });
+    }
+
+    const cleanFilename = filename.replace(/[^a-zA-Z0-9_.-]/g, '');
+    const safeFilename = cleanFilename.length > 128 ? cleanFilename.substring(0, 128) : cleanFilename;
+    if (!safeFilename) {
+      return NextResponse.json({ success: false, error: 'اسم الملف غير صالح' }, { status: 400 });
+    }
+
+    if (content.length > 500000) {
+      return NextResponse.json({ success: false, error: 'حجم المحتوى كبير جداً (الحد الأقصى 500 ألف حرف)' }, { status: 400 });
+    }
+
+    const targetFolder = (typeof folder === 'string' && (folder === 'private' || folder === 'public')) ? folder : 'public';
 
     if (!user && targetFolder === 'private') {
       return NextResponse.json({ success: false, error: 'يجب تسجيل الدخول لحفظ الملفات الخاصة' }, { status: 401 });
-    }
-
-    if (!filename || content === undefined) {
-      return NextResponse.json({ success: false, error: 'Filename and content are required' }, { status: 400 });
     }
 
     const s3 = getR2Client();
     const bucket = getR2Bucket();
     const username = user ? user.username : 'guest';
     
-    let key = `${targetFolder}/${username}/${filename}`;
+    let key = `${targetFolder}/${username}/${safeFilename}`;
 
     // If overwriting or changing visibility of an existing file
-    if (existingKey) {
+    if (existingKey && typeof existingKey === 'string' && existingKey.length <= 256 && !existingKey.includes('..')) {
       const parts = existingKey.split('/');
       const oldFolder = parts[0];
       const owner = parts.length >= 3 ? parts[1] : '';
@@ -104,7 +115,7 @@ export async function POST(request: Request) {
           } catch (e) {
             console.warn('Could not delete old key:', existingKey, e);
           }
-          key = `${targetFolder}/${username}/${filename}`;
+          key = `${targetFolder}/${username}/${safeFilename}`;
         } else {
           key = existingKey;
         }
@@ -134,8 +145,8 @@ export async function DELETE(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
-    if (!key) {
-      return NextResponse.json({ success: false, error: 'Key is required' }, { status: 400 });
+    if (!key || typeof key !== 'string' || key.length > 256 || key.includes('..')) {
+      return NextResponse.json({ success: false, error: 'Key parameter is invalid or missing' }, { status: 400 });
     }
 
     // Check ownership

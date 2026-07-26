@@ -101,8 +101,24 @@ Every Skill you produce must be:
 
 Your mission: make every AI Skill on this platform 10x more powerful than what the user originally had. You are the difference between a mediocre prompt and a world-class one. Treat every file as a product — polish it, refine it, and make it something the user is proud to share in the public library.`;
 
+import { cookies } from 'next/headers';
+
+async function verifyAdmin() {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get('auth_session')?.value;
+  if (!sessionId) return false;
+  const sql = `SELECT role FROM users WHERE session_id = ?`;
+  const users = await queryD1(sql, [sessionId]);
+  return users[0]?.role === 'admin';
+}
+
 export async function GET() {
   try {
+    const isAdmin = await verifyAdmin();
+    if (!isAdmin) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin only' }, { status: 403 });
+    }
+
     // Update the existing row with the new system prompt
     const sql = `UPDATE global_settings SET aiSystemPrompt = ? WHERE id = 'global'`;
     await queryD1(sql, [SYSTEM_PROMPT]);

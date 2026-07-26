@@ -36,7 +36,7 @@ export default function Home() {
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          boxShadow: 'var(--shadow-premium)'
         }}>
           <Sparkles size={16} />
           تجربة كتابة مهارات بصرية مذهلة
@@ -51,7 +51,7 @@ export default function Home() {
           color: 'var(--text-main)'
         }}>
           أدر مهارات <span style={{ 
-            background: 'linear-gradient(135deg, #10b981, #3b82f6)', 
+            background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover))', 
             WebkitBackgroundClip: 'text', 
             WebkitTextFillColor: 'transparent'
           }}>الذكاء الاصطناعي</span> <br/>بكل احترافية.
@@ -70,9 +70,9 @@ export default function Home() {
         
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/vault" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
               🔒 مكتبة ملفاتي الخاصة
-              <ArrowLeft size={18} />
+              <ArrowLeft size={18} className="rtl:rotate-180" />
             </button>
           </Link>
           <Link href="/dashboard" style={{ textDecoration: 'none' }}>
@@ -100,29 +100,29 @@ export default function Home() {
         maxWidth: '1100px'
       }}>
         <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-           <div style={{ padding: '16px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '50%', marginBottom: '20px' }}>
+           <div style={{ padding: '16px', background: 'var(--bg-surface-hover)', borderRadius: '50%', marginBottom: '20px' }}>
              <Code2 size={32} color="var(--brand-primary)" />
            </div>
            <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>محرر Markdown فائق</h3>
-           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>تجربة كتابة سلسلة مع تمييز نحوي وأدوات متقدمة تتكيف مع وضعك المفضل.</p>
+           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>تجربة كتابة سلسة مع تمييز نحوي وأدوات متقدمة تتكيف مع وضعك المفضل.</p>
         </div>
-        <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', transform: 'translateY(-20px)' }}>
-           <div style={{ padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', marginBottom: '20px' }}>
-             <Sparkles size={32} color="#3b82f6" />
+        <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+           <div style={{ padding: '16px', background: 'var(--bg-surface-hover)', borderRadius: '50%', marginBottom: '20px' }}>
+             <Sparkles size={32} color="var(--brand-primary)" />
            </div>
            <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>ذكاء اصطناعي مدمج</h3>
            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>تحدث مع Claude أو DeepSeek أو OpenRouter لتصحيح وتوليد الأوامر البرمجية بدقة.</p>
         </div>
         <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-           <div style={{ padding: '16px', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '50%', marginBottom: '20px' }}>
-             <Cloud size={32} color="#8b5cf6" />
+           <div style={{ padding: '16px', background: 'var(--bg-surface-hover)', borderRadius: '50%', marginBottom: '20px' }}>
+             <Cloud size={32} color="var(--brand-primary)" />
            </div>
            <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مزامنة سحابية لحظية</h3>
            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>احفظ ملفاتك محلياً أو سحابياً باستخدام Firebase مع أعلى معايير الأمان والخصوصية.</p>
         </div>
         <div className="glass-panel" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-           <div style={{ padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '50%', marginBottom: '20px' }}>
-             <Lock size={32} color="#f59e0b" />
+           <div style={{ padding: '16px', background: 'var(--bg-surface-hover)', borderRadius: '50%', marginBottom: '20px' }}>
+             <Lock size={32} color="var(--brand-primary)" />
            </div>
            <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مكتبة ملفات خاصة محمية</h3>
            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>احفظ ملفاتك الشخصية (.pdf, .zip, .png) بكلمة سر خاصة وحماية من المحاولات غير المصرح بها.</p>

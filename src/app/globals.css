@@ -3,11 +3,13 @@
   --radius-button: 8px;
   --radius-panel: 16px;
   --font-scale: 1rem;
+  --bg-app: var(--bg-base);
 }
 
 :root[data-theme="dark"] {
   --bg-base: #050505;
   --bg-main: #050505;
+  --bg-app: #050505;
   --bg-surface: rgba(20, 20, 22, 0.6);
   --bg-surface-solid: #141416;
   --bg-surface-hover: rgba(255, 255, 255, 0.05);
@@ -21,6 +23,7 @@
 :root[data-theme="light"] {
   --bg-base: #f8fafc;
   --bg-main: #f8fafc;
+  --bg-app: #f8fafc;
   --bg-surface: rgba(255, 255, 255, 0.7);
   --bg-surface-solid: #ffffff;
   --bg-surface-hover: rgba(0, 0, 0, 0.04);
@@ -111,10 +114,29 @@ body {
   font-size: calc(1rem * var(--font-scale));
 }
 
+/* Mobile Header & Responsive Sidebar */
+@media (max-width: 767px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  .mobile-header {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-sidebar {
+    display: flex !important;
+  }
+  .mobile-header {
+    display: none !important;
+  }
+}
+
 /* Global Layout & Mesh Animation */
 .layout-container {
   position: relative;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
   display: flex;
@@ -179,7 +201,7 @@ body {
 
 .glass-panel:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-premium);
 }
 
 .btn-primary {
@@ -372,7 +394,7 @@ body {
   width: 100%; height: 100%;
   background-color: var(--bg-surface-solid);
   border-radius: var(--border_radius);
-  box-shadow: inset 0 0.5px rgba(255,255,255,0.2), inset 0 -1px 2px 0 rgba(0,0,0,0.5),
+  box-shadow: inset 0 0.5px var(--border-strong), inset 0 -1px 2px 0 var(--border-subtle),
     0px 4px 10px -4px rgba(0,0,0, calc(1 - var(--active, 0))),
     0 0 0 calc(var(--active, 0) * 0.2rem) var(--brand-glow);
   transition: all var(--transtion);
@@ -454,13 +476,10 @@ body {
 .btn-magic .text_button {
   position: relative;
   z-index: 10;
-  background-image: linear-gradient(90deg, var(--text-main) 0%, rgba(255,255,255, calc(1 - var(--active, 0) * 0.5)) 120%);
-  background-clip: text;
-  -webkit-background-clip: text;
+  color: var(--text-main);
   font-size: 1rem;
   font-family: var(--font-inter), sans-serif;
   font-weight: 600;
-  color: transparent;
 }
 
 /* Library Cards CSS (Ported from Tailwind) */
@@ -553,7 +572,7 @@ body {
 }
 .library-card-normal:hover .icon-box {
   border-color: var(--brand-primary);
-  background: rgba(255,255,255,0.05);
+  background: var(--bg-surface-hover);
 }
 .library-card-normal .line {
   height: 4px; background: var(--text-muted); border-radius: 4px;
@@ -633,7 +652,7 @@ body {
   height: 7rem;
   background-color: transparent;
   filter: blur(0px);
-  border: 8px solid rgba(255, 255, 255, 0.3);
+  border: 8px solid var(--border-strong);
   border-radius: 50%;
   left: -1rem;
   top: -3rem;
@@ -646,7 +665,7 @@ body {
   left: 11rem;
   transform: scale(1.5);
   filter: blur(8px);
-  border-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-subtle);
 }
 
 /* Utility Animations */

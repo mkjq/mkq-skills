@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-async function getVaultPasscode(): Promise<string> {
+async function getVaultPasscode(): Promise<string | null> {
   try {
     await initializeD1();
     const rows = await queryD1(`SELECT value FROM settings WHERE key = 'vault_passcode'`);
@@ -13,13 +13,13 @@ async function getVaultPasscode(): Promise<string> {
       return rows[0].value;
     }
   } catch {}
-  return '1010';
+  return null;
 }
 
 async function isVaultAuthenticated(request: Request) {
   const headerToken = request.headers.get('x-vault-token');
   const targetPasscode = await getVaultPasscode();
-  if (headerToken === targetPasscode || headerToken === 'authenticated_session') {
+  if (targetPasscode && headerToken && headerToken === targetPasscode) {
     return true;
   }
 
@@ -91,8 +91,8 @@ export async function DELETE(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
-    if (!key) {
-      return NextResponse.json({ success: false, error: 'Key is required' }, { status: 400 });
+    if (!key || typeof key !== 'string' || key.length > 256 || key.includes('..')) {
+      return NextResponse.json({ success: false, error: 'مطلوب مفتاح ملف صالح' }, { status: 400 });
     }
 
     const s3 = getR2Client();

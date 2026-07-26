@@ -82,15 +82,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار أي ملف' }, { status: 400 });
     }
 
-    // Limit maximum upload size (100 MB max)
-    const MAX_SIZE = 100 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json({
-        success: false,
-        error: `حجم الملف (${(file.size / (1024 * 1024)).toFixed(1)} MB) كبير جداً. أقصى حد مسموح به هو 100 ميجابايت.`
-      }, { status: 400 });
-    }
-
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 

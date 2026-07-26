@@ -224,7 +224,8 @@ export default function PrivateVaultPage() {
         return new Promise((resolve) => {
           entry.file((file: File) => {
             const relativeName = path ? `${path}/${file.name}` : file.name;
-            const renamedFile = new File([file], relativeName, {
+            const FileCtor = (globalThis as any).File;
+            const renamedFile = new FileCtor([file], relativeName, {
               type: file.type,
               lastModified: file.lastModified
             });

@@ -164,57 +164,25 @@ export default function PrivateVaultPage() {
         const file = fileList[i];
         setCurrentUploadingFile(file.name);
 
-        let isUploaded = false;
+        const formData = new FormData();
+        formData.append('file', file);
 
-        // 1. Attempt Direct Presigned URL Upload (Bypasses Cloudflare 100MB Worker Payload Limit)
+        const res = await fetch('/api/vault/files', {
+          method: 'POST',
+          headers: getHeaders(),
+          body: formData
+        });
+
+        const resText = await res.text();
+        let data: any = {};
         try {
-          const urlRes = await fetch('/api/vault/upload-url', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getHeaders()
-            },
-            body: JSON.stringify({ filename: file.name, contentType: file.type })
-          });
+          data = JSON.parse(resText);
+        } catch {
+          throw new Error(`تعذر رفع الملف "${file.name}".`);
+        }
 
-          if (urlRes.ok) {
-            const urlData = await urlRes.json();
-            if (urlData.success && urlData.uploadUrl) {
-              const directPutRes = await fetch(urlData.uploadUrl, {
-                method: 'PUT',
-                headers: { 'Content-Type': file.type || 'application/octet-stream' },
-                body: file
-              });
-
-              if (directPutRes.ok) {
-                isUploaded = true;
-              }
-            }
-          }
-        } catch {}
-
-        // 2. Fallback to standard server route if presigned upload is bypassed
-        if (!isUploaded) {
-          const formData = new FormData();
-          formData.append('file', file);
-
-          const res = await fetch('/api/vault/files', {
-            method: 'POST',
-            headers: getHeaders(),
-            body: formData
-          });
-
-          const resText = await res.text();
-          let data: any = {};
-          try {
-            data = JSON.parse(resText);
-          } catch {
-            throw new Error(`تعذر رفع الملف "${file.name}"، أعد المحاولة أو اختبر رفع الملف منفصلاً.`);
-          }
-
-          if (!res.ok || !data.success) {
-            throw new Error(data.error || `فشل رفع الملف ${file.name}`);
-          }
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || `فشل رفع الملف ${file.name}`);
         }
 
         successCount++;

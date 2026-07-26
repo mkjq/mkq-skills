@@ -196,7 +196,11 @@ export default function PrivateVaultPage() {
       setUploadMsg({ text: `✅ تم رفع ${successCount} ملف بنجاح إلى مكتبتك المحمية!`, type: 'success' });
       loadFiles();
     } catch (err: any) {
-      setUploadMsg({ text: `❌ ${err.message}`, type: 'error' });
+      const isFetchFail = err?.message === 'Failed to fetch' || err?.name === 'TypeError';
+      const msg = isFetchFail
+        ? `انقطع الاتصال أو تجاوز حجم الملف استيعاب طلب الرفع المباشر. أعد المحاولة أو اختبر رفع الملف بشكل منفرد.`
+        : err.message;
+      setUploadMsg({ text: `❌ ${msg}`, type: 'error' });
     } finally {
       setUploading(false);
       setUploadProgress(0);

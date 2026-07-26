@@ -18,14 +18,14 @@ export async function POST(request: Request) {
   try {
     await initializeD1();
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: 'يجب تسجيل الدخول لرفع الملفات' }, { status: 401 });
-    }
-
     const formData = await request.formData();
     const file = formData.get('file') as File;
     // folder sent from frontend: 'private' or 'public'
-    const folder = (formData.get('folder') as string) || 'private';
+    const folder = (formData.get('folder') as string) || 'public';
+
+    if (!user && folder === 'private') {
+      return NextResponse.json({ success: false, error: 'يجب تسجيل الدخول لرفع الملفات الخاصة' }, { status: 401 });
+    }
 
     if (!file) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار ملف' }, { status: 400 });
@@ -49,8 +49,9 @@ export async function POST(request: Request) {
     const baseName = file.name.replace(/\.(txt|markdown)$/i, '');
     const mdFilename = baseName.endsWith('.md') ? baseName : `${baseName}.md`;
 
-    // Store under folder/username/filename.md — always scoped to user
-    const key = `${folder}/${user.username}/${mdFilename}`;
+    // Store under folder/username/filename.md — guest for unauthenticated
+    const username = user ? user.username : 'guest';
+    const key = `${folder}/${username}/${mdFilename}`;
 
     const s3 = getR2Client();
     const bucket = getR2Bucket();

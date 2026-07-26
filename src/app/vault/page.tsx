@@ -179,7 +179,7 @@ export default function PrivateVaultPage() {
           data = JSON.parse(resText);
         } catch {
           if (res.status === 413) {
-            throw new Error(`حجم الملف "${file.name}" كبير جداً للسحابة (أقصى حد 100MB).`);
+            throw new Error(`حجم الملف "${file.name}" يتجاوز استيعاب السيرفر السحابي الحالي.`);
           }
           throw new Error(`تعذر رفع الملف "${file.name}"، أعد المحاولة أو تأكد من إدخال كلمة السر.`);
         }

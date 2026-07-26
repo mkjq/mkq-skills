@@ -169,16 +169,6 @@ USER REQUEST: "${value}"
 ${SYSTEM_PROMPT_SKILL_RULES}
 
 OUTPUT: Return ONLY the complete operational Markdown Skill file starting with YAML frontmatter. No preamble or chat.`;
-7. \`## 🧭 Behavioral Guidelines\` — numbered rules with examples
-8. \`## 🚫 Constraints\` — table with DO / DON'T columns
-9. \`## 📥 Input Format\` — structured with code block example
-10. \`## 📤 Output Format\` — exact template in code block
-11. \`## 🎨 Tone & Style\` — descriptive with examples
-12. \`## 💬 Examples\` — 3 full input/output pairs in formatted code blocks
-13. \`## ⚡ Edge Cases\` — table with Scenario / How to Handle columns
-14. \`---\` + footer badge line
-
-OUTPUT: Return ONLY the complete operational Markdown Skill file starting with YAML frontmatter. No preamble or chat.`;
 
     try {
       const response = await fetch('/api/ai', {

@@ -82,10 +82,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار أي ملف' }, { status: 400 });
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // Stream body to prevent Out-Of-Memory (OOM) RAM crashes on large files
+    let uploadBody: any;
+    try {
+      uploadBody = file.stream();
+    } catch {
+      const arrayBuffer = await file.arrayBuffer();
+      uploadBody = Buffer.from(arrayBuffer);
+    }
 
-    // Universal upload: accepts ANY file type & folder structure
     const key = `vault/private/${file.name}`;
     const s3 = getR2Client();
     const bucket = getR2Bucket();
@@ -97,7 +102,8 @@ export async function POST(request: Request) {
       new PutObjectCommand({
         Bucket: bucket,
         Key: key,
-        Body: buffer,
+        Body: uploadBody,
+        ContentLength: file.size,
         ContentType: file.type || 'application/octet-stream',
         Metadata: {
           originalName: safeOriginalName,

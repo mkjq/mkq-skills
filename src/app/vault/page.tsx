@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Lock, Unlock, KeyRound, Upload, Download, Trash2, Shield, Folder, File, FileText, FileArchive, Image, Film, Music, RefreshCw, Key, ShieldAlert, ArrowRight } from 'lucide-react';
+import { Lock, Unlock, KeyRound, Upload, Download, Trash2, Shield, Folder, File, FileText, FileArchive, Image, Film, Music, RefreshCw, Key, ShieldAlert, ArrowRight, Eye, CheckCircle2, AlertCircle } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 
 interface VaultFile {
@@ -16,6 +16,7 @@ interface VaultFile {
 export default function PrivateVaultPage() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [passcode, setPasscode] = useState('');
+  const [activeToken, setActiveToken] = useState('');
   const [authError, setAuthError] = useState('');
   const [isLocked, setIsLocked] = useState(false);
   const [lockMessage, setLockMessage] = useState('');
@@ -24,9 +25,17 @@ export default function PrivateVaultPage() {
 
   const [files, setFiles] = useState<VaultFile[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadMsg, setUploadMsg] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'doc' | 'image' | 'archive' | 'media'>('all');
+
+  // Drag and drop state
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Upload progress state
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [currentUploadingFile, setCurrentUploadingFile] = useState<string>('');
+  const [uploadMsg, setUploadMsg] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Passcode Change Modal
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -36,19 +45,11 @@ export default function PrivateVaultPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check initial auth status
+  // Load saved token from localStorage if available
   useEffect(() => {
-    fetch('/api/vault/auth')
-      .then(res => res.json())
-      .then(data => {
-        if (data.authenticated) {
-          setAuthenticated(true);
-          loadFiles();
-        } else {
-          setAuthenticated(false);
-        }
-      })
-      .catch(() => setAuthenticated(false));
+    const savedToken = localStorage.getItem('mkq_vault_token') || '';
+    if (savedToken) setActiveToken(savedToken);
+    checkAuth(savedToken);
   }, []);
 
   // Lockout countdown timer
@@ -67,13 +68,41 @@ export default function PrivateVaultPage() {
     return () => clearInterval(interval);
   }, [lockSeconds]);
 
-  const loadFiles = async () => {
+  const getHeaders = (customToken?: string) => {
+    const token = customToken !== undefined ? customToken : activeToken;
+    const headers: Record<string, string> = {};
+    if (token) headers['x-vault-token'] = token;
+    return headers;
+  };
+
+  const checkAuth = async (token?: string) => {
+    try {
+      const res = await fetch('/api/vault/files', { headers: getHeaders(token) });
+      if (res.ok) {
+        setAuthenticated(true);
+        loadFiles(token);
+      } else {
+        setAuthenticated(false);
+      }
+    } catch {
+      setAuthenticated(false);
+    }
+  };
+
+  const loadFiles = async (token?: string) => {
     setLoadingFiles(true);
     try {
-      const res = await fetch('/api/vault/files');
-      const data = await res.json();
-      if (data.success) setFiles(data.files || []);
-      else setFiles([]);
+      const res = await fetch('/api/vault/files', { headers: getHeaders(token) });
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch {}
+
+      if (res.ok && data.success) {
+        setFiles(data.files || []);
+      } else {
+        setFiles([]);
+        if (res.status === 401) setAuthenticated(false);
+      }
     } catch {
       setFiles([]);
     } finally {
@@ -95,14 +124,20 @@ export default function PrivateVaultPage() {
         body: JSON.stringify({ passcode: passcode.trim() })
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch {}
+
       if (res.status === 429 || data.locked) {
         setIsLocked(true);
         setLockMessage(data.message || 'على مهلك حبيبي جرب بعدين ✋🐢');
         setLockSeconds(data.remainingSeconds || 180);
-      } else if (data.success) {
+      } else if (res.ok && data.success) {
+        const token = passcode.trim();
+        setActiveToken(token);
+        localStorage.setItem('mkq_vault_token', token);
         setAuthenticated(true);
-        loadFiles();
+        loadFiles(token);
       } else {
         setAuthError(data.error || 'كلمة السر غير صحيحة');
       }
@@ -113,53 +148,105 @@ export default function PrivateVaultPage() {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (!selectedFiles || selectedFiles.length === 0) return;
+  const processFilesUpload = async (fileList: FileList | File[]) => {
+    if (!fileList || fileList.length === 0) return;
 
     setUploading(true);
-    setUploadMsg('جاري الرفع وحفظ الملفات في مكتبتك المحمية...');
+    setUploadProgress(0);
+    setUploadMsg({ text: 'جاري بدء رفع الملفات...', type: 'info' });
+
+    const totalFiles = fileList.length;
+    let successCount = 0;
 
     try {
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
+      for (let i = 0; i < totalFiles; i++) {
+        const file = fileList[i];
+        setCurrentUploadingFile(file.name);
+
         const formData = new FormData();
         formData.append('file', file);
 
         const res = await fetch('/api/vault/files', {
           method: 'POST',
+          headers: getHeaders(),
           body: formData
         });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || `فشل رفع ${file.name}`);
+
+        const resText = await res.text();
+        let data: any = {};
+        try { data = JSON.parse(resText); } catch {
+          throw new Error(`استجابة السيرفر غير صالحة أثناء رفع ${file.name}`);
+        }
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || `فشل رفع الملف ${file.name}`);
+        }
+
+        successCount++;
+        const currentPercent = Math.round(((i + 1) / totalFiles) * 100);
+        setUploadProgress(currentPercent);
       }
 
-      setUploadMsg(`✅ تم رفع ${selectedFiles.length} ملف بنجاح في المكتبة الخاصة!`);
+      setUploadMsg({ text: `✅ تم رفع ${successCount} ملف بنجاح إلى مكتبتك المحمية!`, type: 'success' });
       loadFiles();
     } catch (err: any) {
-      setUploadMsg(`❌ خطأ أثناء الرفع: ${err.message}`);
+      setUploadMsg({ text: `❌ ${err.message}`, type: 'error' });
     } finally {
       setUploading(false);
+      setUploadProgress(0);
+      setCurrentUploadingFile('');
       if (fileInputRef.current) fileInputRef.current.value = '';
-      setTimeout(() => setUploadMsg(''), 4000);
+      setTimeout(() => setUploadMsg(null), 5000);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) processFilesUpload(e.target.files);
+  };
+
+  // Drag and Drop Event Handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFilesUpload(e.dataTransfer.files);
     }
   };
 
   const handleDelete = async (key: string, filename: string) => {
     if (!confirm(`هل أنت متأكد من حذف الملف "${filename}" نهائياً من المكتبة الخاصة؟`)) return;
     try {
-      const res = await fetch(`/api/vault/files?key=${encodeURIComponent(key)}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setUploadMsg(`✅ تم حذف "${filename}" بنجاح.`);
+      const res = await fetch(`/api/vault/files?key=${encodeURIComponent(key)}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      const resText = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(resText); } catch {}
+
+      if (res.ok && data.success) {
+        setUploadMsg({ text: `✅ تم حذف "${filename}" بنجاح.`, type: 'success' });
         loadFiles();
       } else {
-        setUploadMsg(`❌ خطأ: ${data.error}`);
+        setUploadMsg({ text: `❌ خطأ: ${data.error || 'تعذر الحذف'}`, type: 'error' });
       }
     } catch (err: any) {
-      setUploadMsg(`❌ فشل الاتصال: ${err.message}`);
+      setUploadMsg({ text: `❌ فشل الاتصال: ${err.message}`, type: 'error' });
     } finally {
-      setTimeout(() => setUploadMsg(''), 4000);
+      setTimeout(() => setUploadMsg(null), 4000);
     }
   };
 
@@ -182,19 +269,29 @@ export default function PrivateVaultPage() {
     try {
       const res = await fetch('/api/vault/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getHeaders()
+        },
         body: JSON.stringify({ newPasscode: newPasscode.trim() })
       });
-      const data = await res.json();
-      if (data.success) {
-        setSettingsMsg('✅ تم تغيير كلمة السر بنجاح!');
+
+      const resText = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(resText); } catch {}
+
+      if (res.ok && data.success) {
+        const token = newPasscode.trim();
+        setActiveToken(token);
+        localStorage.setItem('mkq_vault_token', token);
+        setSettingsMsg('✅ تم تغيير كلمة السر بنجاح وتحديث الجلسة!');
         setTimeout(() => {
           setShowSettingsModal(false);
           setNewPasscode('');
           setSettingsMsg('');
         }, 1500);
       } else {
-        throw new Error(data.error);
+        throw new Error(data.error || 'فشل التغيير');
       }
     } catch (err: any) {
       setSettingsMsg(`❌ خطأ: ${err.message}`);
@@ -227,7 +324,18 @@ export default function PrivateVaultPage() {
     }
   };
 
-  const filteredFiles = files.filter(f => f.filename.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filterByCategory = (file: VaultFile) => {
+    const ext = file.extension;
+    if (categoryFilter === 'image') return ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext);
+    if (categoryFilter === 'doc') return ['pdf', 'docx', 'doc', 'txt', 'md'].includes(ext);
+    if (categoryFilter === 'archive') return ['zip', 'rar', '7z', 'tar', 'gz'].includes(ext);
+    if (categoryFilter === 'media') return ['mp4', 'mov', 'avi', 'mp3', 'wav'].includes(ext);
+    return true;
+  };
+
+  const filteredFiles = files
+    .filter(filterByCategory)
+    .filter(f => f.filename.toLowerCase().includes(searchTerm.toLowerCase()));
 
   // 1. Loading State
   if (authenticated === null) {
@@ -339,7 +447,52 @@ export default function PrivateVaultPage() {
 
   // 4. Authenticated Private Vault Dashboard View
   return (
-    <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflow: 'hidden' }}>
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{ display: 'flex', height: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflow: 'hidden', position: 'relative' }}
+    >
+      {/* Drag and drop overlay target */}
+      {isDragging && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(11, 15, 25, 0.85)',
+          backdropFilter: 'blur(12px)',
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px'
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '700px',
+            height: '400px',
+            borderRadius: '24px',
+            border: '3px dashed var(--brand-primary)',
+            background: 'rgba(59, 130, 246, 0.12)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '20px',
+            boxShadow: '0 0 50px var(--brand-glow)'
+          }}>
+            <div style={{ padding: '24px', background: 'var(--brand-primary)', borderRadius: '50%', boxShadow: '0 8px 30px var(--brand-glow)' }}>
+              <Upload size={48} color="#fff" />
+            </div>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff' }}>
+              أفلت الملفات هنا للرفع الفوري 📥
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
+              يدعم المكتبة المحمية جميع صيغ الملفات والمجلدات
+            </p>
+          </div>
+        </div>
+      )}
+
       <Sidebar />
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
@@ -378,49 +531,134 @@ export default function PrivateVaultPage() {
               type="file"
               multiple
               style={{ display: 'none' }}
-              onChange={handleFileUpload}
+              onChange={handleFileInputChange}
             />
           </div>
         </header>
 
         {/* Content Container */}
         <div style={{ padding: '32px', flex: 1, maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
-          {/* Notifications */}
-          {uploadMsg && (
-            <div style={{ padding: '14px 20px', borderRadius: '12px', background: uploadMsg.includes('❌') ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)', border: uploadMsg.includes('❌') ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)', color: 'var(--text-main)', marginBottom: '24px', fontWeight: '600' }}>
-              {uploadMsg}
+
+          {/* Upload Progress Bar */}
+          {uploading && (
+            <div className="glass-panel" style={{ padding: '20px 24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid var(--brand-primary)', boxShadow: '0 8px 30px var(--brand-glow)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <RefreshCw className="animate-spin" size={18} color="var(--brand-primary)" />
+                  <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>
+                    جاري رفع: {currentUploadingFile || 'الملفات...'}
+                  </span>
+                </div>
+                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--brand-primary)' }}>
+                  {uploadProgress}%
+                </span>
+              </div>
+
+              {/* Progress Bar Container */}
+              <div style={{ width: '100%', height: '10px', borderRadius: '100px', background: 'var(--bg-surface)', overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
+                <div style={{
+                  width: `${uploadProgress}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #10b981, #3b82f6)',
+                  borderRadius: '100px',
+                  transition: 'width 0.3s ease-in-out'
+                }} />
+              </div>
             </div>
           )}
 
-          {/* Stats Bar & Filter */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div className="glass-panel" style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Folder size={20} color="var(--brand-primary)" />
-                <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>إجمالي الملفات</span>
-                  <span style={{ fontWeight: '800', fontSize: '1.1rem' }}>{files.length} ملفات</span>
-                </div>
-              </div>
+          {/* Alert / Notification Message */}
+          {uploadMsg && (
+            <div style={{
+              padding: '14px 20px',
+              borderRadius: '12px',
+              background: uploadMsg.type === 'error' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+              border: uploadMsg.type === 'error' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)',
+              color: 'var(--text-main)',
+              marginBottom: '24px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              {uploadMsg.type === 'error' ? <AlertCircle size={20} color="#ef4444" /> : <CheckCircle2 size={20} color="#10b981" />}
+              {uploadMsg.text}
+            </div>
+          )}
 
-              <div className="glass-panel" style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <ShieldAlert size={20} color="#10b981" />
-                <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>الحماية والحالة</span>
-                  <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#10b981' }}>مكتبة مشفرة مخصصة</span>
-                </div>
+          {/* Stats Bar & Drag Target Showcase */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+            <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <Folder size={24} color="var(--brand-primary)" />
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>إجمالي الملفات</span>
+                <span style={{ fontWeight: '800', fontSize: '1.2rem' }}>{files.length} ملفات</span>
               </div>
             </div>
 
-            <div style={{ minWidth: '300px' }}>
-              <input
-                type="text"
-                placeholder="ابحث في ملفاتك الخاصة..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ width: '100%', padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-main)' }}
-              />
+            <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <ShieldAlert size={24} color="#10b981" />
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>الحماية والحالة</span>
+                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#10b981' }}>مكتملة ومحمية بـ 1010</span>
+              </div>
             </div>
+
+            {/* Quick Filter Categories */}
+            <div className="glass-panel" style={{ padding: '12px 16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'all', label: 'الكل', icon: Folder },
+                { id: 'doc', label: 'مستندات', icon: FileText },
+                { id: 'image', label: 'صور', icon: Image },
+                { id: 'archive', label: 'أرشيف', icon: FileArchive },
+                { id: 'media', label: 'وسائط', icon: Film },
+              ].map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCategoryFilter(cat.id as any)}
+                  className={categoryFilter === cat.id ? 'btn-primary' : 'btn-secondary'}
+                  style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: '8px' }}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Drag and Drop Target Box */}
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              padding: '24px',
+              borderRadius: '16px',
+              border: '2px dashed var(--border-subtle)',
+              background: 'var(--bg-surface)',
+              textAlign: 'center',
+              marginBottom: '32px',
+              cursor: 'pointer',
+              transition: 'all 0.3s'
+            }}
+            onMouseOver={e => (e.currentTarget.style.borderColor = 'var(--brand-primary)')}
+            onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--border-subtle)')}
+          >
+            <Upload size={32} color="var(--brand-primary)" style={{ margin: '0 auto 10px auto' }} />
+            <span style={{ fontWeight: '700', fontSize: '1rem', display: 'block' }}>
+              اضغط هنا أو أفلت أي ملف/مجلد للرفع الفوري 📥
+            </span>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+              يدعم جميع أنواع وصيغ المستندات والصور والأرشيفات الفائقة السرعة
+            </span>
+          </div>
+
+          {/* Search Input */}
+          <div style={{ marginBottom: '24px' }}>
+            <input
+              type="text"
+              placeholder="ابحث في اسم الملف..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ width: '100%', padding: '12px 18px', borderRadius: '12px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-main)', fontSize: '0.95rem' }}
+            />
           </div>
 
           {/* Files Grid */}
@@ -488,7 +726,7 @@ export default function PrivateVaultPage() {
 
       {/* Passcode Settings Modal */}
       {showSettingsModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="glass-panel" style={{ maxWidth: '400px', width: '100%', padding: '28px', borderRadius: '20px', border: '1px solid var(--border-subtle)' }}>
             <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <KeyRound size={20} color="var(--brand-primary)" /> تغيير كلمة سر المكتبة

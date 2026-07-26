@@ -101,6 +101,6 @@ export default function Sidebar() {
           {theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
         </button>
       </div>
-    </div>
+    </aside>
   );
 }

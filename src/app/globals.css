@@ -7,6 +7,7 @@
 
 :root[data-theme="dark"] {
   --bg-base: #050505;
+  --bg-main: #050505;
   --bg-surface: rgba(20, 20, 22, 0.6);
   --bg-surface-solid: #141416;
   --bg-surface-hover: rgba(255, 255, 255, 0.05);
@@ -19,6 +20,7 @@
 
 :root[data-theme="light"] {
   --bg-base: #f8fafc;
+  --bg-main: #f8fafc;
   --bg-surface: rgba(255, 255, 255, 0.7);
   --bg-surface-solid: #ffffff;
   --bg-surface-hover: rgba(0, 0, 0, 0.04);
@@ -645,4 +647,13 @@ body {
   transform: scale(1.5);
   filter: blur(8px);
   border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Utility Animations */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

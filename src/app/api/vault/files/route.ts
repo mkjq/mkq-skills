@@ -82,6 +82,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار أي ملف' }, { status: 400 });
     }
 
+    // Limit maximum upload size (100 MB max)
+    const MAX_SIZE = 100 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({
+        success: false,
+        error: `حجم الملف (${(file.size / (1024 * 1024)).toFixed(1)} MB) كبير جداً. أقصى حد مسموح به هو 100 ميجابايت.`
+      }, { status: 400 });
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -90,6 +99,9 @@ export async function POST(request: Request) {
     const s3 = getR2Client();
     const bucket = getR2Bucket();
 
+    // S3 Metadata keys/values MUST be ASCII safe
+    const safeOriginalName = encodeURIComponent(file.name);
+
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,
@@ -97,7 +109,7 @@ export async function POST(request: Request) {
         Body: buffer,
         ContentType: file.type || 'application/octet-stream',
         Metadata: {
-          originalName: file.name,
+          originalName: safeOriginalName,
           uploadedAt: new Date().toISOString(),
           vault: 'private'
         },

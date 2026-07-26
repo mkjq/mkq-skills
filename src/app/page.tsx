@@ -69,16 +69,21 @@ export default function Home() {
         </p>
         
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Link href="/dashboard" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
-              تصفح مكتبة المهارات العامة
+          <Link href="/vault" style={{ textDecoration: 'none' }}>
+            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+              🔒 مكتبة ملفاتي الخاصة (1010)
               <ArrowLeft size={18} />
+            </button>
+          </Link>
+          <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+            <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
+              المكتبة السحابية العامة
             </button>
           </Link>
           <Link href="/dashboard/editor" style={{ textDecoration: 'none' }}>
             <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
               <Sparkles size={18} />
-              إنشاء مهارة جديدة بالذكاء الاصطناعي
+              إنشاء مهارة جديدة
             </button>
           </Link>
         </div>

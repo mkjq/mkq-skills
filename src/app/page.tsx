@@ -71,14 +71,14 @@ export default function Home() {
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/dashboard" style={{ textDecoration: 'none' }}>
             <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
-              ابدأ الاستخدام الآن
+              تصفح مكتبة المهارات العامة
               <ArrowLeft size={18} />
             </button>
           </Link>
-          <Link href="/library" style={{ textDecoration: 'none' }}>
+          <Link href="/dashboard/editor" style={{ textDecoration: 'none' }}>
             <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px' }}>
-              <Library size={18} />
-              المكتبة الرقمية
+              <Sparkles size={18} />
+              إنشاء مهارة جديدة بالذكاء الاصطناعي
             </button>
           </Link>
         </div>

@@ -71,7 +71,7 @@ export default function Home() {
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/vault" style={{ textDecoration: 'none' }}>
             <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '12px', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
-              🔒 مكتبة ملفاتي الخاصة (1010)
+              🔒 مكتبة ملفاتي الخاصة
               <ArrowLeft size={18} />
             </button>
           </Link>
@@ -125,7 +125,7 @@ export default function Home() {
              <Lock size={32} color="#f59e0b" />
            </div>
            <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>مكتبة ملفات خاصة محمية</h3>
-           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>احفظ ملفاتك الشخصية (.pdf, .zip, .png) بكلمة سر 1010 وحماية من المحاولات غير المصرح بها.</p>
+           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.5' }}>احفظ ملفاتك الشخصية (.pdf, .zip, .png) بكلمة سر خاصة وحماية من المحاولات غير المصرح بها.</p>
         </div>
       </div>
       

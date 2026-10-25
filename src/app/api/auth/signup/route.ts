@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { queryD1, initializeD1 } from '@/lib/cloudflare';
 import { cookies } from 'next/headers';
+import { hashPassword } from '@/lib/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     
     // Create user
     const insertSql = `INSERT INTO users (id, username, password, role, session_id) VALUES (?, ?, ?, ?, ?)`;
-    await queryD1(insertSql, [userId, username, password, 'user', sessionId]);
+    await queryD1(insertSql, [userId, username, await hashPassword(password), 'user', sessionId]);
 
     // Set cookie
     const cookieStore = await cookies();

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { queryD1, initializeD1 } from '@/lib/cloudflare';
 import { cookies } from 'next/headers';
+import { hashPassword, verifyPassword } from '@/lib/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,21 +15,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'اسم المستخدم وكلمة المرور مطلوبان بالشكل الصحيح' }, { status: 400 });
     }
 
-    const sql = `SELECT * FROM users WHERE username = ? AND password = ?`;
-    const users = await queryD1(sql, [username, password]);
+    const users = await queryD1(`SELECT * FROM users WHERE username = ?`, [username]);
+    const user = users[0];
+    const check = await verifyPassword(password, user?.password);
 
-    if (users.length === 0) {
+    if (!user || !check.ok) {
       return NextResponse.json({ success: false, error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, { status: 401 });
     }
 
-    const user = users[0];
-    
     // Generate session ID
     const sessionId = crypto.randomUUID();
-    
-    // Update session in D1
-    const updateSql = `UPDATE users SET session_id = ? WHERE id = ?`;
-    await queryD1(updateSql, [sessionId, user.id]);
+
+    // Update session in D1 (and replace a legacy plaintext / weaker hash with the current one)
+    if (check.needsRehash) {
+      await queryD1(`UPDATE users SET session_id = ?, password = ? WHERE id = ?`, [sessionId, await hashPassword(password), user.id]);
+    } else {
+      await queryD1(`UPDATE users SET session_id = ? WHERE id = ?`, [sessionId, user.id]);
+    }
 
     // Set cookie
     const cookieStore = await cookies();
